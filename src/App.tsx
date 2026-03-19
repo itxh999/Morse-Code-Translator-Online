@@ -297,6 +297,7 @@ export default function App() {
               onClick={() => { setShowSettings(!showSettings); setShowInfo(false); }}
               className={`p-2 rounded-full transition-colors ${showSettings ? 'bg-amber-400 text-black' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
               title="Settings"
+              aria-label="Open Settings"
             >
               <Settings className="w-5 h-5" />
             </button>
@@ -304,6 +305,7 @@ export default function App() {
               onClick={() => { setShowInfo(!showInfo); setShowSettings(false); }}
               className={`p-2 rounded-full transition-colors ${showInfo ? 'bg-amber-400 text-black' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
               title="Morse Code Reference"
+              aria-label="Open Morse Code Reference"
             >
               <Info className="w-5 h-5" />
             </button>
@@ -321,22 +323,22 @@ export default function App() {
             >
               <div className="flex items-center justify-between border-b border-gray-800 pb-3">
                 <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> Quick Settings</h3>
-                <button onClick={() => setShowSettings(false)} className="text-gray-500 hover:text-white">×</button>
+                <button onClick={() => setShowSettings(false)} className="text-gray-500 hover:text-white text-xl" aria-label="Close Settings">×</button>
               </div>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-gray-400">
-                    <span>Speed (WPM)</span>
+                    <label htmlFor="wpm-range">Speed (WPM)</label>
                     <span className="text-amber-400">{wpm}</span>
                   </div>
-                  <input type="range" min="5" max="50" value={wpm} onChange={(e) => setWpm(parseInt(e.target.value))} className="w-full accent-amber-400" />
+                  <input id="wpm-range" type="range" min="5" max="50" value={wpm} onChange={(e) => setWpm(parseInt(e.target.value))} className="w-full accent-amber-400" />
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-gray-400">
-                    <span>Frequency (Hz)</span>
+                    <label htmlFor="freq-range">Frequency (Hz)</label>
                     <span className="text-amber-400">{frequency}</span>
                   </div>
-                  <input type="range" min="300" max="1200" step="10" value={frequency} onChange={(e) => setFrequency(parseInt(e.target.value))} className="w-full accent-amber-400" />
+                  <input id="freq-range" type="range" min="300" max="1200" step="10" value={frequency} onChange={(e) => setFrequency(parseInt(e.target.value))} className="w-full accent-amber-400" />
                 </div>
               </div>
             </motion.div>
@@ -351,7 +353,7 @@ export default function App() {
             >
               <div className="flex items-center justify-between border-b border-gray-800 pb-3 sticky top-0 bg-[#1a1d23] z-10">
                 <h3 className="font-bold flex items-center gap-2"><Info className="w-4 h-4" /> Morse Reference Guide</h3>
-                <button onClick={() => setShowInfo(false)} className="text-gray-500 hover:text-white">×</button>
+                <button onClick={() => setShowInfo(false)} className="text-gray-500 hover:text-white text-xl" aria-label="Close Reference Guide">×</button>
               </div>
               
               <div className="space-y-6">
@@ -426,14 +428,23 @@ export default function App() {
               </div>
               
               <div className="flex items-center gap-3">
-                <button onClick={clearAll} className="p-2 text-gray-500 hover:text-red-400 transition-colors" title="Clear All">
+                <button 
+                  onClick={clearAll} 
+                  className="p-2 text-gray-500 hover:text-red-400 transition-colors" 
+                  title="Clear All"
+                  aria-label="Clear all input and output"
+                >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
             <div className="relative group">
+              <label htmlFor="morse-input" className="sr-only">
+                {activeTab === 'text-to-morse' ? 'English text to translate' : 'Morse code to translate'}
+              </label>
               <textarea
+                id="morse-input"
                 ref={inputRef}
                 value={activeTab === 'text-to-morse' ? text : morse}
                 onChange={activeTab === 'text-to-morse' ? handleTextChange : handleMorseChange}
@@ -445,6 +456,7 @@ export default function App() {
                 <button 
                   onClick={() => copyToClipboard(activeTab === 'text-to-morse' ? text : morse)}
                   className="p-2 bg-gray-800/50 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-all border border-gray-700/50"
+                  aria-label="Copy input text"
                 >
                   <Copy className="w-4 h-4" />
                 </button>
@@ -501,6 +513,7 @@ export default function App() {
                 <button 
                   onClick={() => copyToClipboard(activeTab === 'text-to-morse' ? morse : text)}
                   className="p-2 bg-gray-800/50 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-all border border-gray-700/50"
+                  aria-label="Copy translation output"
                 >
                   <Copy className="w-4 h-4" />
                 </button>
@@ -581,6 +594,7 @@ export default function App() {
                     onTouchStart={handleKeyDown}
                     onTouchEnd={handleKeyUp}
                     className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full bg-stone-950 shadow-[0_8px_0_0_#000,0_15px_25px_rgba(0,0,0,0.6)] active:translate-y-1 active:shadow-[0_4px_0_0_#000,0_10px_15px_rgba(0,0,0,0.6)] transition-all flex items-center justify-center group z-20 overflow-hidden"
+                    aria-label="Telegraph key - press to transmit morse code"
                   >
                     {/* Knob Texture */}
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.1),transparent)]" />

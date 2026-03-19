@@ -24,10 +24,27 @@ export default function App() {
   const [frequency, setFrequency] = useState(600);
   const [isFlashing, setIsFlashing] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   const [activeTab, setActiveTab] = useState<'text-to-morse' | 'morse-to-text'>('text-to-morse');
   
   const { playMorse, stopAudio, isPlaying, currentIndex } = useMorseAudio();
   const flashRef = useRef<HTMLDivElement>(null);
+
+  const MORSE_REFERENCE = [
+    { char: 'A', code: '.-' }, { char: 'B', code: '-...' }, { char: 'C', code: '-.-.' },
+    { char: 'D', code: '-..' }, { char: 'E', code: '.' }, { char: 'F', code: '..-.' },
+    { char: 'G', code: '--.' }, { char: 'H', code: '....' }, { char: 'I', code: '..' },
+    { char: 'J', code: '.---' }, { char: 'K', code: '-.-' }, { char: 'L', code: '.-..' },
+    { char: 'M', code: '--' }, { char: 'N', code: '-.' }, { char: 'O', code: '---' },
+    { char: 'P', code: '.--.' }, { char: 'Q', code: '--.-' }, { char: 'R', code: '.-.' },
+    { char: 'S', code: '...' }, { char: 'T', code: '-' }, { char: 'U', code: '..-' },
+    { char: 'V', code: '...-' }, { char: 'W', code: '.--' }, { char: 'X', code: '-..-' },
+    { char: 'Y', code: '-.--' }, { char: 'Z', code: '--..' },
+    { char: '1', code: '.----' }, { char: '2', code: '..---' }, { char: '3', code: '...--' },
+    { char: '4', code: '....-' }, { char: '5', code: '.....' }, { char: '6', code: '-....' },
+    { char: '7', code: '--...' }, { char: '8', code: '---..' }, { char: '9', code: '----.' },
+    { char: '0', code: '-----' }
+  ];
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
@@ -161,16 +178,76 @@ export default function App() {
           
           <div className="flex items-center gap-2">
             <button 
-              onClick={() => setShowSettings(!showSettings)}
-              className="p-2 hover:bg-gray-800 rounded-full transition-colors text-gray-400 hover:text-white"
+              onClick={() => { setShowSettings(!showSettings); setShowInfo(false); }}
+              className={`p-2 rounded-full transition-colors ${showSettings ? 'bg-amber-400 text-black' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+              title="Settings"
             >
               <Settings className="w-5 h-5" />
             </button>
-            <button className="p-2 hover:bg-gray-800 rounded-full transition-colors text-gray-400 hover:text-white">
+            <button 
+              onClick={() => { setShowInfo(!showInfo); setShowSettings(false); }}
+              className={`p-2 rounded-full transition-colors ${showInfo ? 'bg-amber-400 text-black' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+              title="Morse Code Reference"
+            >
               <Info className="w-5 h-5" />
             </button>
           </div>
         </div>
+
+        {/* Modals Container */}
+        <AnimatePresence>
+          {showSettings && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-16 right-4 w-72 bg-[#1a1d23] border border-gray-800 rounded-2xl shadow-2xl p-6 z-50 space-y-6"
+            >
+              <div className="flex items-center justify-between border-b border-gray-800 pb-3">
+                <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> Quick Settings</h3>
+                <button onClick={() => setShowSettings(false)} className="text-gray-500 hover:text-white">×</button>
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs text-gray-400">
+                    <span>Speed (WPM)</span>
+                    <span className="text-amber-400">{wpm}</span>
+                  </div>
+                  <input type="range" min="5" max="50" value={wpm} onChange={(e) => setWpm(parseInt(e.target.value))} className="w-full accent-amber-400" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs text-gray-400">
+                    <span>Frequency (Hz)</span>
+                    <span className="text-amber-400">{frequency}</span>
+                  </div>
+                  <input type="range" min="300" max="1200" step="10" value={frequency} onChange={(e) => setFrequency(parseInt(e.target.value))} className="w-full accent-amber-400" />
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {showInfo && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-16 right-4 w-80 max-h-[80vh] overflow-auto bg-[#1a1d23] border border-gray-800 rounded-2xl shadow-2xl p-6 z-50 space-y-6"
+            >
+              <div className="flex items-center justify-between border-b border-gray-800 pb-3 sticky top-0 bg-[#1a1d23] z-10">
+                <h3 className="font-bold flex items-center gap-2"><Info className="w-4 h-4" /> Morse Reference</h3>
+                <button onClick={() => setShowInfo(false)} className="text-gray-500 hover:text-white">×</button>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {MORSE_REFERENCE.map((item) => (
+                  <div key={item.char} className="flex items-center justify-between p-2 bg-gray-900/50 rounded-lg border border-gray-800 hover:border-amber-400/30 transition-colors">
+                    <span className="font-bold text-white">{item.char}</span>
+                    <span className="font-mono text-amber-400 text-sm">{item.code}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8">

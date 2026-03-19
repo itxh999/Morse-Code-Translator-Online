@@ -225,8 +225,6 @@ export default function App() {
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat) return;
-      
       if (e.code === 'Space') {
         const target = e.target as HTMLElement;
         // If we're in text-to-morse mode and typing in an input, let the spacebar work normally
@@ -234,9 +232,13 @@ export default function App() {
           return;
         }
         
-        // Otherwise, it's a telegraph key press - prevent scrolling!
+        // ALWAYS prevent default for spacebar to stop scrolling, even during repeat
         e.preventDefault();
-        handleKeyDown(e);
+        
+        // Only trigger the telegraph key if it's the initial press
+        if (!e.repeat) {
+          handleKeyDown(e);
+        }
       }
     };
     const handleGlobalKeyUp = (e: KeyboardEvent) => {

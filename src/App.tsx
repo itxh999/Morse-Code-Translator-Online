@@ -28,6 +28,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'text-to-morse' | 'morse-to-text'>('text-to-morse');
   const [lastSymbol, setLastSymbol] = useState<string | null>(null);
   const [silenceProgress, setSilenceProgress] = useState(0); // 0 to 100
+  const [isTelegraphFocused, setIsTelegraphFocused] = useState(false);
   
   const { playMorse, stopAudio, isPlaying, currentIndex } = useMorseAudio();
   const flashRef = useRef<HTMLDivElement>(null);
@@ -225,41 +226,56 @@ export default function App() {
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInput = target.tagName === 'TEXTAREA' || target.tagName === 'INPUT' || target.isContentEditable;
+
       if (e.code === 'Space') {
-        const target = e.target as HTMLElement;
-        // If we're in text-to-morse mode and typing in an input, let the spacebar work normally
-        if (activeTab === 'text-to-morse' && (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT')) {
-          return;
-        }
-        
-        // ALWAYS prevent default for spacebar to stop scrolling, even during repeat
-        e.preventDefault();
-        
-        // Only trigger the telegraph key if it's the initial press
-        if (!e.repeat) {
-          handleKeyDown(e);
+        // If user is typing in ANY input, let spacebar work normally
+        if (isInput) return;
+
+        // Only intercept if we are in morse-to-text mode AND the telegraph is focused
+        if (activeTab === 'morse-to-text' && isTelegraphFocused) {
+          e.preventDefault();
+          if (!e.repeat) {
+            handleKeyDown(e);
+          }
         }
       }
     };
     const handleGlobalKeyUp = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
         const target = e.target as HTMLElement;
-        // Match the logic in KeyDown
-        if (activeTab === 'text-to-morse' && (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT')) {
-          return;
+        const isInput = target.tagName === 'TEXTAREA' || target.tagName === 'INPUT' || target.isContentEditable;
+        
+        if (isInput) return;
+
+        if (activeTab === 'morse-to-text' && isTelegraphFocused) {
+          e.preventDefault();
+          handleKeyUp();
         }
-        e.preventDefault();
-        handleKeyUp();
+      }
+    };
+
+    // Global click listener to handle focus/blur of telegraph
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const telegraphContainer = document.getElementById('telegraph-station');
+      if (telegraphContainer?.contains(target)) {
+        setIsTelegraphFocused(true);
+      } else {
+        setIsTelegraphFocused(false);
       }
     };
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     window.addEventListener('keyup', handleGlobalKeyUp);
+    window.addEventListener('click', handleGlobalClick);
     return () => {
       window.removeEventListener('keydown', handleGlobalKeyDown);
       window.removeEventListener('keyup', handleGlobalKeyUp);
+      window.removeEventListener('click', handleGlobalClick);
     };
-  }, [handleKeyDown, handleKeyUp]);
+  }, [handleKeyDown, handleKeyUp, activeTab, isTelegraphFocused]);
 
   return (
     <div className="min-h-screen bg-[#0f1115] text-gray-100 font-sans selection:bg-amber-400/30">
@@ -392,21 +408,24 @@ export default function App() {
           {/* Input Section */}
           <section className="space-y-4">
             <div className="flex items-center justify-between mb-2">
-              <div className="flex bg-gray-900 p-1 rounded-lg border border-gray-800">
-                <button 
-                  onClick={() => setActiveTab('text-to-morse')}
-                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'text-to-morse' ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
-                >
-                  English to Morse Code
-                </button>
-                <button 
-                  onClick={() => setActiveTab('morse-to-text')}
-                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'morse-to-text' ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
-                >
-                  Morse Code to English
-                </button>
+              <div className="flex items-center gap-3">
+                <div className="flex bg-gray-900 p-1 rounded-lg border border-gray-800">
+                  <button 
+                    onClick={() => setActiveTab('text-to-morse')}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'text-to-morse' ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
+                  >
+                    English to Morse Code
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('morse-to-text')}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'morse-to-text' ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
+                  >
+                    Morse Code to English
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-2">
+              
+              <div className="flex items-center gap-3">
                 <button onClick={clearAll} className="p-2 text-gray-500 hover:text-red-400 transition-colors" title="Clear All">
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -418,6 +437,7 @@ export default function App() {
                 ref={inputRef}
                 value={activeTab === 'text-to-morse' ? text : morse}
                 onChange={activeTab === 'text-to-morse' ? handleTextChange : handleMorseChange}
+                onFocus={() => setIsTelegraphFocused(false)}
                 placeholder={activeTab === 'text-to-morse' ? "English to morse code translator..." : "Translate morse code to english..."}
                 className="w-full h-64 bg-[#1a1d23] border border-gray-800 rounded-2xl p-6 font-mono text-lg focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all resize-none placeholder:text-gray-600 overflow-y-auto"
               />
@@ -491,7 +511,30 @@ export default function App() {
 
         {/* Manual Key & Controls */}
         <div className="mt-12 grid md:grid-cols-3 gap-8">
-          <div className="md:col-span-2 bg-[#1a1d23] border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center gap-10 overflow-hidden relative">
+          <div 
+            id="telegraph-station"
+            className={`md:col-span-2 bg-[#1a1d23] border-2 rounded-2xl p-8 flex flex-col items-center justify-center gap-10 overflow-hidden relative transition-all duration-300 ${isTelegraphFocused ? 'border-amber-400/50 shadow-[0_0_30px_rgba(251,191,36,0.1)] ring-1 ring-amber-400/20' : 'border-gray-800'}`}
+          >
+            {/* Focus Indicator */}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
+              <div className="flex items-center gap-2">
+                <div className={`w-1.5 h-1.5 rounded-full ${isTelegraphFocused ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-gray-700'}`} />
+                <span className={`text-[9px] font-bold uppercase tracking-widest ${isTelegraphFocused ? 'text-emerald-500' : 'text-gray-600'}`}>
+                  {isTelegraphFocused ? 'Telegraph Active' : 'Station Standby'}
+                </span>
+              </div>
+              
+              {isTelegraphFocused && (
+                <div className="h-3 w-[1px] bg-gray-800" />
+              )}
+
+              {isTelegraphFocused && (
+                <span className="text-[9px] text-gray-500 font-mono italic animate-pulse">
+                  [Spacebar to Transmit]
+                </span>
+              )}
+            </div>
+
             {/* Background Texture/Pattern */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
             

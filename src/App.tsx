@@ -34,6 +34,18 @@ export default function App() {
   const silenceTimeoutRef = useRef<any>(null);
   const wordSilenceTimeoutRef = useRef<any>(null);
   const progressIntervalRef = useRef<any>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const outputRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.scrollTop = inputRef.current.scrollHeight;
+    }
+    if (outputRef.current) {
+      outputRef.current.scrollTop = outputRef.current.scrollHeight;
+    }
+  }, [morse, text]);
 
   const MORSE_REFERENCE = [
     { char: 'A', code: '.-', type: 'letter' }, { char: 'B', code: '-...', type: 'letter' }, { char: 'C', code: '-.-.', type: 'letter' },
@@ -163,8 +175,7 @@ export default function App() {
     }
 
     setMorse(prev => {
-      const cleaned = prev.trimEnd();
-      const newMorse = cleaned + symbol;
+      const newMorse = prev + symbol;
       setText(morseToText(newMorse));
       return newMorse;
     });
@@ -174,8 +185,8 @@ export default function App() {
     if (wordSilenceTimeoutRef.current) clearTimeout(wordSilenceTimeoutRef.current);
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
 
-    const charSilenceTime = dotDuration * 8; // 8 dots for character space (standard is 3)
-    const wordSilenceTime = dotDuration * 15; // 15 dots for word space (standard is 7)
+    const charSilenceTime = dotDuration * 20; // 20 dots for character space (approx 1.2s at 20wpm)
+    const wordSilenceTime = dotDuration * 45; // 45 dots for word space (approx 2.7s at 20wpm)
     const startTime = Date.now();
 
     // Visual progress update
@@ -189,6 +200,9 @@ export default function App() {
     silenceTimeoutRef.current = setTimeout(() => {
       setMorse(prev => {
         if (prev.endsWith(' ') || prev.endsWith('/') || prev === '') return prev;
+        // Visual feedback for space
+        setLastSymbol('␣');
+        setTimeout(() => setLastSymbol(null), 400);
         const newMorse = prev + ' ';
         setText(morseToText(newMorse));
         return newMorse;
@@ -197,6 +211,9 @@ export default function App() {
       wordSilenceTimeoutRef.current = setTimeout(() => {
         setMorse(prev => {
           if (prev.endsWith('/') || prev === '') return prev;
+          // Visual feedback for word break
+          setLastSymbol('/');
+          setTimeout(() => setLastSymbol(null), 400);
           const newMorse = prev.trimEnd() + ' / ';
           setText(morseToText(newMorse));
           return newMorse;
@@ -208,18 +225,28 @@ export default function App() {
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      // Ignore if repeating or if typing in an input/textarea
       if (e.repeat) return;
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT') return;
-
+      
       if (e.code === 'Space') {
+        const target = e.target as HTMLElement;
+        // If we're in text-to-morse mode and typing in an input, let the spacebar work normally
+        if (activeTab === 'text-to-morse' && (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT')) {
+          return;
+        }
+        
+        // Otherwise, it's a telegraph key press - prevent scrolling!
         e.preventDefault();
         handleKeyDown(e);
       }
     };
     const handleGlobalKeyUp = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
+        const target = e.target as HTMLElement;
+        // Match the logic in KeyDown
+        if (activeTab === 'text-to-morse' && (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT')) {
+          return;
+        }
+        e.preventDefault();
         handleKeyUp();
       }
     };
@@ -386,10 +413,11 @@ export default function App() {
 
             <div className="relative group">
               <textarea
+                ref={inputRef}
                 value={activeTab === 'text-to-morse' ? text : morse}
                 onChange={activeTab === 'text-to-morse' ? handleTextChange : handleMorseChange}
                 placeholder={activeTab === 'text-to-morse' ? "English to morse code translator..." : "Translate morse code to english..."}
-                className="w-full h-64 bg-[#1a1d23] border border-gray-800 rounded-2xl p-6 font-mono text-lg focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all resize-none placeholder:text-gray-600"
+                className="w-full h-64 bg-[#1a1d23] border border-gray-800 rounded-2xl p-6 font-mono text-lg focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all resize-none placeholder:text-gray-600 overflow-y-auto"
               />
               <div className="absolute bottom-4 right-4 flex gap-2">
                 <button 
@@ -418,25 +446,36 @@ export default function App() {
             </div>
 
             <div className="relative group">
-              <div className="w-full h-64 bg-[#1a1d23]/50 border border-gray-800 rounded-2xl p-6 font-mono text-lg overflow-auto break-all text-amber-400/90 leading-relaxed">
-                {activeTab === 'text-to-morse' ? (
-                  morse ? (
-                    morse.split('').map((char, idx) => (
-                      <span 
-                        key={idx} 
-                        className={`transition-colors duration-75 ${currentIndex === idx ? 'bg-amber-400 text-black px-0.5 rounded shadow-[0_0_10px_rgba(251,191,36,0.5)]' : ''}`}
-                      >
-                        {char}
-                      </span>
-                    ))
+              <div 
+                ref={outputRef}
+                className="w-full h-64 bg-[#1a1d23]/50 border border-gray-800 rounded-2xl p-6 font-mono text-lg overflow-auto break-all text-amber-400/90 leading-relaxed relative"
+              >
+                <div className="relative z-10 whitespace-pre-wrap">
+                  {activeTab === 'text-to-morse' ? (
+                    morse ? (
+                      morse.split('').map((char, idx) => (
+                        <span 
+                          key={idx} 
+                          className={`transition-colors duration-75 ${currentIndex === idx ? 'bg-amber-400 text-black px-0.5 rounded shadow-[0_0_10px_rgba(251,191,36,0.5)]' : ''} ${char === ' ' ? 'inline-block w-2' : ''}`}
+                        >
+                          {char === ' ' ? '\u00A0' : char}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-gray-700">Translate morse code results...</span>
+                    )
                   ) : (
-                    <span className="text-gray-700">Translate morse code results...</span>
-                  )
-                ) : (
-                  text || <span className="text-gray-700">Morse code translater results...</span>
-                )}
+                    text || <span className="text-gray-700">Morse code translater results...</span>
+                  )}
+                  {/* Blinking Cursor */}
+                  <motion.span
+                    animate={{ opacity: [1, 0] }}
+                    transition={{ duration: 0.8, repeat: Infinity }}
+                    className="inline-block w-2.5 h-5 bg-amber-400 ml-1 align-middle"
+                  />
+                </div>
               </div>
-              <div className="absolute bottom-4 right-4 flex gap-2">
+              <div className="absolute bottom-4 right-4 flex gap-2 z-20">
                 <button 
                   onClick={() => copyToClipboard(activeTab === 'text-to-morse' ? morse : text)}
                   className="p-2 bg-gray-800/50 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-all border border-gray-700/50"
@@ -554,10 +593,12 @@ export default function App() {
                   </div>
                 </div>
                 <span className="text-[10px] font-mono text-gray-500">
-                  {silenceProgress < 50 ? 'WAITING...' : silenceProgress < 100 ? 'CHAR BREAK' : 'WORD BREAK'}
+                  {silenceProgress < 44 ? 'WAITING...' : silenceProgress < 100 ? 'CHAR BREAK' : 'WORD BREAK'}
                 </span>
               </div>
-              <div className="h-1 bg-stone-900 rounded-full overflow-hidden border border-white/5">
+              <div className="h-1 bg-stone-900 rounded-full overflow-hidden border border-white/5 relative">
+                {/* Visual markers for thresholds */}
+                <div className="absolute left-[44%] top-0 bottom-0 w-px bg-white/10 z-10" />
                 <motion.div 
                   className="h-full bg-gradient-to-r from-amber-600 to-amber-400"
                   animate={{ width: `${silenceProgress}%` }}

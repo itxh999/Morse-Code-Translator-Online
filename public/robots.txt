@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ais-dev-bcgqblm25427oxs5g46wl3-511439541463.us-east1.run.app/sitemap.xml
+Sitemap: https://morse-code-translator.wwkejishe.top/sitemap.xml

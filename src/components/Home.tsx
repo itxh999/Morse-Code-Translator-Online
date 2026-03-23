@@ -32,7 +32,9 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-display font-bold text-white">Popular Morse Code Phrases</h2>
           <div className="h-px bg-gray-800 flex-grow mx-8 hidden md:block" />
-          <span className="text-xs font-mono text-gray-500 uppercase tracking-widest">Internal Links for SEO</span>
+          <Link to="/alphabet" className="text-xs font-mono text-amber-400 hover:text-amber-300 uppercase tracking-widest flex items-center gap-2 transition-colors">
+            View Full Alphabet <ArrowRight className="w-3 h-3" />
+          </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {MORSE_WORDS.map((word) => (

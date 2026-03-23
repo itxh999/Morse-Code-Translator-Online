@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './components/Home';
 import WordDetail from './components/WordDetail';
+import Alphabet from './components/Alphabet';
 
 function App() {
   const [wpm, setWpm] = useState(20);
@@ -23,6 +24,7 @@ function App() {
               />
             } 
           />
+          <Route path="/alphabet" element={<Alphabet />} />
           <Route 
             path="/words/:slug" 
             element={

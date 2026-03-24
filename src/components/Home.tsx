@@ -132,7 +132,14 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
           <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800 space-y-4">
             <div className="flex items-center justify-between border-b border-gray-800 pb-4">
               <span className="text-xs font-mono text-gray-500 uppercase">Developer Access</span>
-              <button className="text-[10px] font-mono text-amber-400 hover:underline">Copy URL</button>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText('https://morse-code-translator.wwkejishe.top/');
+                }}
+                className="text-[10px] font-mono text-amber-400 hover:underline active:opacity-50 transition-opacity"
+              >
+                Copy URL
+              </button>
             </div>
             <code className="block text-sm text-amber-400 font-mono bg-black/30 p-4 rounded-lg break-all">
               https://morse-code-translator.wwkejishe.top/

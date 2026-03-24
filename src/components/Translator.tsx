@@ -239,6 +239,7 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
       const telegraphContainer = document.getElementById('telegraph-station');
       if (telegraphContainer?.contains(target)) {
         setIsTelegraphFocused(true);
+        setActiveTab('morse-to-text');
       } else {
         setIsTelegraphFocused(false);
       }
@@ -252,7 +253,7 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
       window.removeEventListener('keyup', handleGlobalKeyUp);
       window.removeEventListener('click', handleGlobalClick);
     };
-  }, [handleKeyDown, handleKeyUp, activeTab, isTelegraphFocused]);
+  }, [handleKeyDown, handleKeyUp, activeTab, isTelegraphFocused, setActiveTab]);
 
   return (
     <>

@@ -44,7 +44,7 @@ export default function Alphabet() {
   return (
     <div className="space-y-12">
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-xs font-mono text-gray-500 uppercase tracking-widest">
+      <nav className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest">
         <Link to="/" className="hover:text-amber-400 transition-colors">Home</Link>
         <ChevronRight className="w-3 h-3" />
         <span className="text-amber-400">Morse Code Alphabet</span>
@@ -59,7 +59,7 @@ export default function Alphabet() {
             <h1 className="text-4xl font-display font-bold text-white leading-tight">
               Morse Code Alphabet
             </h1>
-            <p className="text-gray-500 font-mono text-sm tracking-widest mt-2 uppercase">International Standard Reference</p>
+            <p className="text-gray-400 font-mono text-sm tracking-widest mt-2 uppercase">International Standard Reference</p>
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function Alphabet() {
                     <tr key={item.char} className="hover:bg-gray-800/20 transition-colors">
                       <td className="p-4 text-xl font-bold text-white border-b border-gray-800/50">{item.char}</td>
                       <td className="p-4 font-mono text-amber-400 text-lg border-b border-gray-800/50">{item.code}</td>
-                      <td className="p-4 text-sm text-gray-500 italic border-b border-gray-800/50">{getPhonetic(item.code)}</td>
+                      <td className="p-4 text-sm text-gray-400 italic border-b border-gray-800/50">{getPhonetic(item.code)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -147,7 +147,7 @@ export default function Alphabet() {
                     <tr key={item.char} className="hover:bg-gray-800/20 transition-colors">
                       <td className="p-4 text-xl font-bold text-white border-b border-gray-800/50">{item.char}</td>
                       <td className="p-4 font-mono text-amber-400 text-lg border-b border-gray-800/50">{item.code}</td>
-                      <td className="p-4 text-sm text-gray-500 italic border-b border-gray-800/50">{getPhonetic(item.code)}</td>
+                      <td className="p-4 text-sm text-gray-400 italic border-b border-gray-800/50">{getPhonetic(item.code)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -175,7 +175,7 @@ export default function Alphabet() {
                     <tr key={item.char} className="hover:bg-gray-800/20 transition-colors">
                       <td className="p-4 text-xl font-bold text-white border-b border-gray-800/50">{item.char}</td>
                       <td className="p-4 font-mono text-amber-400 text-lg border-b border-gray-800/50">{item.code}</td>
-                      <td className="p-4 text-sm text-gray-500 italic border-b border-gray-800/50">{getPhonetic(item.code)}</td>
+                      <td className="p-4 text-sm text-gray-400 italic border-b border-gray-800/50">{getPhonetic(item.code)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -243,7 +243,7 @@ export default function Alphabet() {
                   <Volume2 className="w-4 h-4" />
                   <span className="text-xs font-bold uppercase tracking-wider">Audio Tips</span>
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed">
+                <p className="text-xs text-gray-400 leading-relaxed">
                   Listen to the rhythm of the code rather than counting dots and dashes. This is the key to high-speed proficiency.
                 </p>
               </div>
@@ -252,7 +252,7 @@ export default function Alphabet() {
                   <PenTool className="w-4 h-4" />
                   <span className="text-xs font-bold uppercase tracking-wider">Writing Tips</span>
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed">
+                <p className="text-xs text-gray-400 leading-relaxed">
                   A dash is three times the length of a dot. The space between parts of the same letter is one dot.
                 </p>
               </div>

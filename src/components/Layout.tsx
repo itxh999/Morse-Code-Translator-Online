@@ -43,7 +43,7 @@ export default function Layout({ children }: LayoutProps) {
             </div>
             <div>
               <h1 className="text-xl font-display font-bold tracking-tight">Morse Code Translator Online</h1>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Professional Morse Code Website</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-mono">Professional Morse Code Website</p>
             </div>
           </Link>
           
@@ -123,12 +123,12 @@ export default function Layout({ children }: LayoutProps) {
 
       <footer className="mt-20 border-t border-gray-800 py-8 bg-[#0a0c10]">
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-gray-500 text-xs">© 2026 Morse Code Translator Website. Professional Signal Tools.</p>
+          <p className="text-gray-400 text-xs">© 2026 Morse Code Translator Website. Professional Signal Tools.</p>
           <div className="flex gap-6">
-            <Link to="/" className="text-gray-500 hover:text-amber-400 text-xs transition-colors">Home</Link>
-            <a href="#" className="text-gray-500 hover:text-amber-400 text-xs transition-colors">Privacy Policy</a>
-            <a href="#" className="text-gray-500 hover:text-amber-400 text-xs transition-colors">Terms of Service</a>
-            <a href="#" className="text-gray-500 hover:text-amber-400 text-xs transition-colors">Contact</a>
+            <Link to="/" className="text-gray-400 hover:text-amber-400 text-xs transition-colors">Home</Link>
+            <a href="#" className="text-gray-400 hover:text-amber-400 text-xs transition-colors">Privacy Policy</a>
+            <a href="#" className="text-gray-400 hover:text-amber-400 text-xs transition-colors">Terms of Service</a>
+            <a href="#" className="text-gray-400 hover:text-amber-400 text-xs transition-colors">Contact</a>
           </div>
         </div>
       </footer>

@@ -287,11 +287,11 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
             <div className="flex items-center gap-3">
               <button 
                 onClick={clearAll} 
-                className="p-2 text-gray-500 hover:text-red-400 transition-colors" 
+                className="p-3 text-gray-500 hover:text-red-400 transition-colors" 
                 title="Clear All"
                 aria-label="Clear all input and output"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -312,10 +312,10 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
             <div className="absolute bottom-4 right-4 flex gap-2">
               <button 
                 onClick={() => copyToClipboard(activeTab === 'text-to-morse' ? text : morse)}
-                className="p-2 bg-gray-800/50 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-all border border-gray-700/50"
+                className="p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-all border border-gray-700/50"
                 aria-label="Copy input text"
               >
-                <Copy className="w-4 h-4" />
+                <Copy className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -324,11 +324,12 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
         {/* Output Section */}
         <section className="space-y-4">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-mono uppercase tracking-widest text-gray-500">Translation Output</h2>
+            <h2 className="text-sm font-mono uppercase tracking-widest text-gray-400">Translation Output</h2>
             <div className="flex gap-2">
               <button 
                 onClick={handlePlay}
-                className={`flex items-center gap-2 px-4 py-1.5 rounded-lg font-medium transition-all ${isPlaying ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-amber-400 text-black hover:bg-amber-300'}`}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-all ${isPlaying ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-amber-400 text-black hover:bg-amber-300'}`}
+                aria-label={isPlaying ? 'Stop Audio' : 'Play Morse Code Audio'}
               >
                 {isPlaying ? <Square className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
                 {isPlaying ? 'Stop Audio' : 'Morse Code Translator Audio'}
@@ -353,10 +354,10 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
                       </span>
                     ))
                   ) : (
-                    <span className="text-gray-700">Translate morse code results...</span>
+                    <span className="text-gray-500">Translate morse code results...</span>
                   )
                 ) : (
-                  text || <span className="text-gray-700">Morse code translater results...</span>
+                  text || <span className="text-gray-500">Morse code translater results...</span>
                 )}
                 {/* Blinking Cursor */}
                 <motion.span
@@ -369,10 +370,10 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
             <div className="absolute bottom-4 right-4 flex gap-2 z-20">
               <button 
                 onClick={() => copyToClipboard(activeTab === 'text-to-morse' ? morse : text)}
-                className="p-2 bg-gray-800/50 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-all border border-gray-700/50"
+                className="p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-all border border-gray-700/50"
                 aria-label="Copy translation output"
               >
-                <Copy className="w-4 h-4" />
+                <Copy className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -488,17 +489,18 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
         </div>
 
         <div className="bg-[#1a1d23] border border-gray-800 rounded-2xl p-8 space-y-6">
-          <h3 className="text-sm font-mono uppercase tracking-widest text-gray-500 flex items-center gap-2">
+          <h3 className="text-sm font-mono uppercase tracking-widest text-gray-400 flex items-center gap-2">
             <Settings className="w-4 h-4" /> Signal Settings
           </h3>
           
           <div className="space-y-4">
             <div className="space-y-2">
               <div className="flex justify-between">
-                <label className="text-xs text-gray-400">Speed (WPM)</label>
+                <label htmlFor="speed-range" className="text-xs text-gray-400">Speed (WPM)</label>
                 <span className="text-xs font-mono text-amber-400">{wpm}</span>
               </div>
               <input 
+                id="speed-range"
                 type="range" min="5" max="50" value={wpm} 
                 onChange={(e) => setWpm(parseInt(e.target.value))}
                 className="w-full accent-amber-400 bg-gray-800 h-1.5 rounded-lg appearance-none cursor-pointer"
@@ -507,10 +509,11 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <label className="text-xs text-gray-400">Frequency (Hz)</label>
+                <label htmlFor="freq-range" className="text-xs text-gray-400">Frequency (Hz)</label>
                 <span className="text-xs font-mono text-amber-400">{frequency}</span>
               </div>
               <input 
+                id="freq-range"
                 type="range" min="300" max="1200" step="10" value={frequency} 
                 onChange={(e) => setFrequency(parseInt(e.target.value))}
                 className="w-full accent-amber-400 bg-gray-800 h-1.5 rounded-lg appearance-none cursor-pointer"

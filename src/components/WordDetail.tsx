@@ -62,10 +62,10 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
   return (
     <div className="space-y-12">
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-xs font-mono text-gray-500 uppercase tracking-widest">
+      <nav className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest">
         <Link to="/" className="hover:text-amber-400 transition-colors">Home</Link>
         <ChevronRight className="w-3 h-3" />
-        <span className="text-gray-700">Words</span>
+        <span className="text-gray-400">Words</span>
         <ChevronRight className="w-3 h-3" />
         <span className="text-amber-400">{wordData.word}</span>
       </nav>
@@ -83,7 +83,7 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
           </div>
         </div>
         <div className="flex gap-2">
-          <span className="px-3 py-1 bg-gray-800 rounded-full text-[10px] font-mono text-gray-500 uppercase tracking-widest border border-gray-700">
+          <span className="px-3 py-1 bg-gray-800 rounded-full text-[10px] font-mono text-gray-400 uppercase tracking-widest border border-gray-700">
             Popular Phrase
           </span>
           <span className="px-3 py-1 bg-amber-400/10 rounded-full text-[10px] font-mono text-amber-400 uppercase tracking-widest border border-amber-400/20">
@@ -139,7 +139,7 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
                     <tr key={i} className="hover:bg-gray-800/20 transition-colors">
                       <td className="p-4 text-xl font-bold text-white border-b border-gray-800/50">{char}</td>
                       <td className="p-4 font-mono text-amber-400 text-lg border-b border-gray-800/50">{MORSE_MAP[char] || ''}</td>
-                      <td className="p-4 text-sm text-gray-500 italic border-b border-gray-800/50">{char === ' ' ? '(Space)' : getHowToSay(MORSE_MAP[char] || '')}</td>
+                      <td className="p-4 text-sm text-gray-400 italic border-b border-gray-800/50">{char === ' ' ? '(Space)' : getHowToSay(MORSE_MAP[char] || '')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -156,7 +156,7 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
             <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center gap-6">
               <div className="text-6xl font-mono text-white tracking-[0.5em]">{wordData.morse}</div>
               <div className="h-px w-full bg-gray-800" />
-              <p className="text-gray-500 text-center max-w-md">
+              <p className="text-gray-400 text-center max-w-md">
                 To write "{wordData.word}" in Morse code, you use a series of dots and dashes. 
                 A dot is a short signal, and a dash is a long signal (three times the length of a dot).
               </p>
@@ -220,9 +220,9 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
                 >
                   <div>
                     <span className="block font-bold text-white group-hover:text-amber-400 transition-colors">{word.word}</span>
-                    <span className="block text-[10px] font-mono text-gray-500 mt-1">{word.morse}</span>
+                    <span className="block text-[10px] font-mono text-gray-400 mt-1">{word.morse}</span>
                   </div>
-                  <ArrowLeft className="w-4 h-4 text-gray-600 group-hover:text-amber-400 rotate-180 transition-all" />
+                  <ArrowLeft className="w-4 h-4 text-gray-400 group-hover:text-amber-400 rotate-180 transition-all" />
                 </Link>
               ))}
             </div>

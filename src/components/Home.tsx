@@ -45,7 +45,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
             >
               <div className="absolute top-0 left-0 w-full h-1 bg-amber-400/0 group-hover:bg-amber-400 transition-all" />
               <span className="block font-bold text-white group-hover:text-amber-400 transition-colors text-lg mb-1">{word.word}</span>
-              <span className="block text-[10px] font-mono text-gray-500 tracking-widest">{word.morse}</span>
+              <span className="block text-[10px] font-mono text-gray-400 tracking-widest">{word.morse}</span>
               <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-[10px] text-amber-400 font-bold uppercase">
                 Learn More <ArrowRight className="w-3 h-3" />
               </div>
@@ -112,7 +112,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
                 {feature.icon}
               </div>
               <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{feature.desc}</p>
+              <p className="text-sm text-gray-400 leading-relaxed">{feature.desc}</p>
             </div>
           ))}
         </div>
@@ -132,7 +132,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
           ].map((faq, i) => (
             <div key={i} className="space-y-3">
               <h3 className="text-lg font-bold text-amber-400 flex items-start gap-3">
-                <span className="text-gray-600">Q:</span> {faq.q}
+                <span className="text-gray-400">Q:</span> {faq.q}
               </h3>
               <p className="text-gray-400 text-sm leading-relaxed pl-8">
                 {faq.a}
@@ -175,11 +175,11 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
             <div className="space-y-4">
               <div className="bg-gray-900/50 p-4 rounded-xl border border-gray-800">
                 <h4 className="font-bold text-amber-400 text-sm mb-1">The Koch Method</h4>
-                <p className="text-xs text-gray-500">Learning at full speed (20+ WPM) from the start to build muscle memory and avoid "counting" dots and dashes.</p>
+                <p className="text-xs text-gray-400">Learning at full speed (20+ WPM) from the start to build muscle memory and avoid "counting" dots and dashes.</p>
               </div>
               <div className="bg-gray-900/50 p-4 rounded-xl border border-gray-800">
                 <h4 className="font-bold text-amber-400 text-sm mb-1">Farnsworth Timing</h4>
-                <p className="text-xs text-gray-500">Characters are sent at high speed, but the spacing between them is increased to give you time to process.</p>
+                <p className="text-xs text-gray-400">Characters are sent at high speed, but the spacing between them is increased to give you time to process.</p>
               </div>
             </div>
           </div>

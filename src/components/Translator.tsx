@@ -10,11 +10,13 @@ import {
   Settings, 
   Zap,
   Keyboard,
-  Radio
+  Radio,
+  Image as ImageIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { textToMorse, morseToText } from '../services/morseUtils';
 import { useMorseAudio } from '../hooks/useMorseAudio';
+import ImageGenerator from './ImageGenerator';
 
 interface TranslatorProps {
   initialText?: string;
@@ -33,6 +35,7 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
   const [lastSymbol, setLastSymbol] = useState<string | null>(null);
   const [silenceProgress, setSilenceProgress] = useState(0); // 0 to 100
   const [isTelegraphFocused, setIsTelegraphFocused] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   
   const { playMorse, stopAudio, isPlaying, currentIndex } = useMorseAudio();
   const silenceTimeoutRef = useRef<any>(null);
@@ -308,7 +311,7 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
               onChange={activeTab === 'text-to-morse' ? handleTextChange : handleMorseChange}
               onFocus={() => setIsTelegraphFocused(false)}
               placeholder={activeTab === 'text-to-morse' ? "English to morse code translator..." : "Translate morse code to english..."}
-              className="w-full h-64 bg-[#1a1d23] border border-gray-800 rounded-2xl p-6 font-mono text-lg focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all resize-none placeholder:text-gray-600 overflow-y-auto"
+              className="w-full h-72 bg-[#1a1d23] border border-gray-800 rounded-2xl p-6 font-mono text-lg focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all resize-none placeholder:text-gray-600 overflow-y-auto shadow-inner"
             />
             <div className="absolute bottom-4 right-4 flex gap-2">
               <button 
@@ -326,22 +329,12 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
         <section className="space-y-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm font-mono uppercase tracking-widest text-gray-400">Translation Output</h2>
-            <div className="flex gap-2">
-              <button 
-                onClick={handlePlay}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-all ${isPlaying ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-amber-400 text-black hover:bg-amber-300'}`}
-                aria-label={isPlaying ? 'Stop Audio' : 'Play Morse Code Audio'}
-              >
-                {isPlaying ? <Square className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
-                {isPlaying ? 'Stop Audio' : 'Morse Code Translator Audio'}
-              </button>
-            </div>
           </div>
 
           <div className="relative group">
             <div 
               ref={outputRef}
-              className="w-full h-64 bg-[#1a1d23]/50 border border-gray-800 rounded-2xl p-6 font-mono text-lg overflow-auto break-all text-amber-400/90 leading-relaxed relative"
+              className="w-full h-72 bg-[#1a1d23] border border-gray-800 rounded-2xl p-6 font-mono text-lg overflow-auto break-all text-amber-400/90 leading-relaxed relative shadow-inner"
             >
               <div className="relative z-10 whitespace-pre-wrap">
                 {activeTab === 'text-to-morse' ? (
@@ -377,6 +370,26 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
                 <Copy className="w-5 h-5" />
               </button>
             </div>
+          </div>
+
+          {/* Action Buttons Below Output */}
+          <div className="flex gap-2 sm:gap-3">
+            <button 
+              onClick={() => setIsImageModalOpen(true)}
+              className="flex-1 flex items-center justify-center gap-2 px-3 sm:px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-xl text-xs sm:text-sm font-medium transition-colors text-gray-300 border border-gray-700/50 whitespace-nowrap"
+              aria-label="Generate Morse Image"
+            >
+              <ImageIcon className="w-4 h-4 shrink-0" />
+              <span>Generate Image</span>
+            </button>
+            <button 
+              onClick={handlePlay}
+              className={`flex-[1.5] flex items-center justify-center gap-2 px-3 sm:px-5 py-3 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${isPlaying ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-amber-400 text-black hover:bg-amber-300'}`}
+              aria-label={isPlaying ? 'Stop Audio' : 'Play Morse Code Audio'}
+            >
+              {isPlaying ? <Square className="w-4 h-4 fill-current shrink-0" /> : <Play className="w-4 h-4 fill-current shrink-0" />}
+              <span>{isPlaying ? 'Stop Audio' : 'Morse Code Audio'}</span>
+            </button>
           </div>
         </section>
       </div>
@@ -529,6 +542,13 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
           </div>
         </div>
       </div>
+
+      <ImageGenerator 
+        isOpen={isImageModalOpen} 
+        onClose={() => setIsImageModalOpen(false)} 
+        text={text || "Morse Code"} 
+        morse={morse || "...."} 
+      />
     </>
   );
 }

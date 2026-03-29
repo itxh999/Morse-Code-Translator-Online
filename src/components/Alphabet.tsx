@@ -74,8 +74,28 @@ export default function Alphabet() {
             </div>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-400 leading-relaxed text-lg">
-                The <strong>Morse code alphabet</strong> is a system used in telecommunication to encode text characters as standardized sequences of two different signal durations, called dots and dashes. Each letter of the alphabet, number, and punctuation mark has a unique sequence. This system is the foundation for sending messages like <Link to="/words/sos" className="text-amber-400 hover:underline">SOS</Link> or simple greetings like <Link to="/words/hello" className="text-amber-400 hover:underline">Hello</Link>.
+                The <strong>Morse code alphabet</strong> is a sophisticated encoding system that translates text into a series of on-off tones, lights, or clicks. Developed in the 1830s, it remains one of the most resilient forms of communication ever devised. Unlike modern binary systems, the <strong>morse code alphabet</strong> was designed to be decoded by humans without the need for a computer, making it an invaluable skill for emergency and amateur radio operations.
               </p>
+              <p className="text-gray-400 leading-relaxed">
+                Each character in the <strong>morse code alphabet</strong> is a unique combination of "dots" (short signals) and "dashes" (long signals). The length of these signals is not arbitrary; they follow a strict mathematical ratio to ensure clarity across noisy radio frequencies.
+              </p>
+            </div>
+          </article>
+
+          {/* Character Frequency & Design */}
+          <article className="space-y-6">
+            <div className="flex items-center gap-3 text-amber-400">
+              <Zap className="w-6 h-6" />
+              <h2 className="text-2xl font-display font-bold text-white">The Logic of Character Frequency</h2>
+            </div>
+            <div className="prose prose-invert max-w-none">
+              <p className="text-gray-400 leading-relaxed">
+                Have you ever wondered why 'E' is just a single dot (<code>.</code>) while 'Q' is a complex <code>--.-</code>? The <strong>morse code alphabet</strong> was designed based on English letter frequency. Samuel Morse and Alfred Vail counted the number of type pieces in a local newspaper's printing office to determine which letters were used most often.
+              </p>
+              <ul className="text-gray-400 space-y-2 list-disc pl-5">
+                <li><strong>Efficiency:</strong> The most common letters (E, T, A, I, N) were given the shortest codes to increase the overall speed of transmission.</li>
+                <li><strong>Complexity:</strong> Rare letters (Q, Z, J, X) were assigned longer, more distinct patterns to prevent confusion.</li>
+              </ul>
             </div>
           </article>
 
@@ -196,22 +216,73 @@ export default function Alphabet() {
             </div>
           </article>
 
-          {/* Learning Section */}
-          <article className="space-y-6">
+          {/* Mnemonics Section */}
+          <article className="space-y-8">
             <div className="flex items-center gap-3 text-amber-400">
               <BookOpen className="w-6 h-6" />
-              <h2 className="text-2xl font-display font-bold text-white">Tips for Learning the Morse Code Alphabet</h2>
+              <h2 className="text-2xl font-display font-bold text-white">Morse Code Mnemonics: How to Remember the Alphabet</h2>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              {[
+                { letter: "A", code: ".-", mnemonic: "<strong>A</strong>-part (di-dah)" },
+                { letter: "B", code: "-...", mnemonic: "<strong>B</strong>ob is a dog (dah-di-di-dit)" },
+                { letter: "C", code: "-.-.", mnemonic: "<strong>C</strong>o-ca Co-la (dah-di-dah-dit)" },
+                { letter: "D", code: "-..", mnemonic: "<strong>D</strong>og-gy-it (dah-di-dit)" },
+                { letter: "S", code: "...", mnemonic: "<strong>S</strong>-S-S (di-di-dit)" },
+                { letter: "O", code: "---", mnemonic: "<strong>O</strong>-O-O (dah-dah-dah)" }
+              ].map((m, i) => (
+                <div key={i} className="p-4 bg-[#1a1d23] border border-gray-800 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl font-bold text-white">{m.letter}</span>
+                    <span className="text-amber-400 font-mono">{m.code}</span>
+                  </div>
+                  <span className="text-xs text-gray-400" dangerouslySetInnerHTML={{ __html: m.mnemonic }} />
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-gray-500 italic">Using word-association mnemonics is one of the fastest ways to memorize the <strong>morse code alphabet</strong> for beginners.</p>
+          </article>
+
+          {/* Standard Comparison */}
+          <article className="space-y-6">
+            <div className="flex items-center gap-3 text-amber-400">
+              <History className="w-6 h-6" />
+              <h2 className="text-2xl font-display font-bold text-white">International vs. American Morse Code</h2>
             </div>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-400 leading-relaxed">
-                Learning the Morse code alphabet can be a rewarding challenge. Here are some tips to get started:
+                It's important to note that the <strong>morse code alphabet</strong> we use today is the <strong>International Morse Code</strong>. However, in the 19th century, "American Morse" (also known as Railroad Morse) was the standard in the United States.
               </p>
-              <ul className="text-gray-400 space-y-2 list-disc pl-5">
-                <li><strong>Listen to the sound:</strong> Don't just look at the dots and dashes. Listen to the rhythm of the code.</li>
-                <li><strong>Start with common letters:</strong> Focus on the most frequently used letters first.</li>
-                <li><strong>Practice regularly:</strong> Consistency is key to building muscle memory.</li>
-                <li><strong>Use a translator:</strong> Our <Link to="/" className="text-amber-400 hover:underline">Morse Code Translator</Link> can help you verify your translations.</li>
-              </ul>
+              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-bold">Key Difference:</span>
+                  <span className="text-gray-400 text-xs uppercase font-mono">Technical Detail</span>
+                </div>
+                <p className="text-sm text-gray-400">
+                  American Morse used different spacing within characters and different lengths for dashes. For example, the letter 'C' in American Morse was <code>.. .</code> (two dots, a space, and a dot), whereas in International Morse it is <code>-.-.</code>. Today, International Morse is the only standard recognized globally.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          {/* Alphabet FAQ */}
+          <article className="space-y-8">
+            <div className="flex items-center gap-3 text-amber-400">
+              <HelpCircle className="w-6 h-6" />
+              <h2 className="text-2xl font-display font-bold text-white">Morse Code Alphabet FAQ</h2>
+            </div>
+            <div className="space-y-6">
+              {[
+                { q: "Is the Morse code alphabet case-sensitive?", a: "No, the <strong>morse code alphabet</strong> does not distinguish between uppercase and lowercase letters. 'A' and 'a' are both transmitted as <code>.-</code>." },
+                { q: "Why are some letters longer than others?", a: "The length is based on frequency in the English language. Common letters like 'E' are short (<code>.</code>), while rare letters like 'J' are long (<code>.---</code>) to save time during transmission." },
+                { q: "Are there Morse codes for non-English characters?", a: "Yes, there are extensions for accented characters (like 'é' or 'ñ') and other alphabets (Cyrillic, Greek, Arabic), but these are not part of the standard International Morse Code used for English." },
+                { q: "What is a 'prosign' in the Morse alphabet?", a: "Prosigns are procedural signals like <code>.-.-.</code> (AR - End of Message) that are written as two letters run together without a space." }
+              ].map((faq, i) => (
+                <div key={i} className="space-y-2 border-b border-gray-800 pb-6 last:border-0">
+                  <h3 className="text-lg font-bold text-white">Q: {faq.q}</h3>
+                  <p className="text-sm text-gray-400 leading-relaxed" dangerouslySetInnerHTML={{ __html: faq.a }} />
+                </div>
+              ))}
             </div>
           </article>
 

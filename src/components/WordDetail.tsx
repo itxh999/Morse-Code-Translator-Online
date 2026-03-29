@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MORSE_WORDS } from '../constants/words';
 import Translator from './Translator';
-import { ArrowLeft, BookOpen, History, Info, PenTool, Volume2, HelpCircle, ChevronRight, Table } from 'lucide-react';
+import { ArrowLeft, BookOpen, History, Info, PenTool, Volume2, HelpCircle, ChevronRight, Table, Zap } from 'lucide-react';
 
 interface WordDetailProps {
   wpm: number;
@@ -114,7 +114,50 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
             </div>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-400 leading-relaxed text-lg">
-                In Morse code, <strong>{wordData.word}</strong> is represented by the sequence <code>{wordData.morse}</code>. {wordData.description}
+                In Morse code, <strong>{wordData.word}</strong> is represented by the sequence <code>{wordData.morse}</code>. This specific combination of signals is one of the most recognized patterns in the <strong>morse code translator</strong> database. {wordData.description}
+              </p>
+              <p className="text-gray-400 leading-relaxed">
+                Whether you are a hobbyist or a professional, understanding how to transmit <strong>{wordData.word} in morse code</strong> is a fundamental skill. Using a <strong>morse code translator online</strong> allows you to verify the timing and rhythm of this phrase, ensuring it is technically accurate according to ITU standards.
+              </p>
+            </div>
+          </article>
+
+          {/* Technical Timing Section */}
+          <article className="space-y-6">
+            <div className="flex items-center gap-3 text-amber-400">
+              <Zap className="w-6 h-6" />
+              <h2 className="text-2xl font-display font-bold text-white">Technical Timing Analysis of "{wordData.word}"</h2>
+            </div>
+            <div className="bg-[#1a1d23] border border-gray-800 rounded-3xl p-8 space-y-6">
+              <p className="text-sm text-gray-400 leading-relaxed">
+                To perfectly transmit <strong>{wordData.word} in morse code</strong>, one must follow the standard 1:3 timing ratio. Here is the mathematical breakdown of the sequence <code>{wordData.morse}</code>:
+              </p>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
+                  <span className="text-xs font-mono text-gray-500 block mb-1">Total Units</span>
+                  <span className="text-xl font-bold text-white">
+                    {wordData.morse.split('').reduce((acc, char) => {
+                      if (char === '.') return acc + 2; // 1 for dot, 1 for gap
+                      if (char === '-') return acc + 4; // 3 for dash, 1 for gap
+                      if (char === ' ') return acc + 2; // 3 total for letter gap (already added 1)
+                      return acc;
+                    }, 0)} Units
+                  </span>
+                </div>
+                <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
+                  <span className="text-xs font-mono text-gray-500 block mb-1">Duration at 20 WPM</span>
+                  <span className="text-xl font-bold text-white">
+                    {(wordData.morse.split('').reduce((acc, char) => {
+                      if (char === '.') return acc + 2;
+                      if (char === '-') return acc + 4;
+                      if (char === ' ') return acc + 2;
+                      return acc;
+                    }, 0) * 60).toFixed(0)} ms
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 italic">
+                *Calculated using the PARIS standard where 1 unit = 60ms at 20 WPM. Our <strong>morse code translator</strong> handles this precision automatically.
               </p>
             </div>
           </article>
@@ -197,12 +240,35 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
           <article className="space-y-6">
             <div className="flex items-center gap-3 text-amber-400">
               <BookOpen className="w-6 h-6" />
-              <h2 className="text-2xl font-display font-bold text-white">Examples of {wordData.word} in Morse Code</h2>
+              <h2 className="text-2xl font-display font-bold text-white">Examples & Cultural Context of {wordData.word}</h2>
             </div>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-400 leading-relaxed">
                 {wordData.usage}
               </p>
+              <p className="text-gray-400 leading-relaxed">
+                The phrase <strong>{wordData.word} in morse code</strong> has appeared in numerous historical documents and modern media. Its distinct rhythm makes it a favorite for sound designers and radio operators alike. By using our <strong>morse code translator online</strong>, you can explore how this phrase sounds at different speeds and frequencies.
+              </p>
+            </div>
+          </article>
+
+          {/* Word Specific FAQ */}
+          <article className="space-y-8">
+            <div className="flex items-center gap-3 text-amber-400">
+              <HelpCircle className="w-6 h-6" />
+              <h2 className="text-2xl font-display font-bold text-white">FAQ: {wordData.word} in Morse Code</h2>
+            </div>
+            <div className="space-y-6">
+              {[
+                { q: `How do I write ${wordData.word} in morse code?`, a: `To write <strong>${wordData.word}</strong>, use the sequence <code>${wordData.morse}</code>. Ensure you leave a space (3 units) between each letter for clarity.` },
+                { q: `What does ${wordData.word} sound like in Morse?`, a: `It sounds like <em>"${getHowToSay(wordData.morse)}"</em>. You can hear the actual audio by using the 'Play' button on our <strong>morse code translator</strong> above.` },
+                { q: `Is ${wordData.word} a common Morse code phrase?`, a: `Yes, it is one of the most frequently searched and used phrases in the <strong>morse code translator</strong> community due to its historical and practical significance.` }
+              ].map((faq, i) => (
+                <div key={i} className="space-y-2 border-b border-gray-800 pb-6 last:border-0">
+                  <h3 className="text-lg font-bold text-white">Q: {faq.q}</h3>
+                  <p className="text-sm text-gray-400 leading-relaxed" dangerouslySetInnerHTML={{ __html: faq.a }} />
+                </div>
+              ))}
             </div>
           </article>
         </div>

@@ -1,7 +1,26 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Table, Info, Volume2, PenTool, HelpCircle, ChevronRight, BookOpen, History, Zap } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { 
+  ArrowLeft, 
+  Table, 
+  Info, 
+  Volume2, 
+  PenTool, 
+  HelpCircle, 
+  ChevronRight, 
+  BookOpen, 
+  History, 
+  Zap,
+  Printer,
+  Download
+} from 'lucide-react';
 import { MORSE_WORDS } from '../constants/words';
+import SEOHead from './SEOHead';
+import { SupportedLanguage, TRANSLATIONS } from '../constants/translations';
+
+interface AlphabetProps {
+  lang?: SupportedLanguage;
+}
 
 const ALPHABET = [
   { char: 'A', code: '.-' }, { char: 'B', code: '-...' }, { char: 'C', code: '-.-.' }, { char: 'D', code: '-..' },
@@ -29,13 +48,114 @@ const PUNCTUATION = [
   { char: '@', code: '.--.-.' }
 ];
 
-export default function Alphabet() {
-  React.useEffect(() => {
-    document.title = 'Morse Code Alphabet - Letters, Numbers & Punctuation';
-    return () => {
-      document.title = 'Morse Code Translator - English to Morse Code Online';
-    };
-  }, []);
+export default function Alphabet({ lang = 'en' }: AlphabetProps) {
+  const [searchParams] = useSearchParams();
+  const urlLang = (searchParams.get('lang') as SupportedLanguage) || lang;
+  const textDict = TRANSLATIONS[urlLang] || TRANSLATIONS.en;
+
+  const playSignal = (code: string) => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
+      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+      
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      osc.start();
+      
+      let time = audioCtx.currentTime + 0.02;
+      const dotDuration = 0.07; // Snappy character feedback
+      
+      code.split('').forEach((symbol) => {
+        if (symbol === '.') {
+          gainNode.gain.setValueAtTime(0, time);
+          gainNode.gain.linearRampToValueAtTime(0.8, time + 0.005);
+          time += dotDuration;
+          gainNode.gain.setValueAtTime(0.8, time);
+          gainNode.gain.linearRampToValueAtTime(0, time + 0.005);
+          time += dotDuration; 
+        } else if (symbol === '-') {
+          gainNode.gain.setValueAtTime(0, time);
+          gainNode.gain.linearRampToValueAtTime(0.8, time + 0.005);
+          time += dotDuration * 3;
+          gainNode.gain.setValueAtTime(0.8, time);
+          gainNode.gain.linearRampToValueAtTime(0, time + 0.005);
+          time += dotDuration; 
+        }
+      });
+      
+      osc.stop(time + 0.05);
+    } catch (err) {
+      console.error("Audio playback error", err);
+    }
+  };
+
+  const downloadCheatSheetSVG = () => {
+    const alphabetItems = ALPHABET.map((item, i) => {
+      const col = i % 4;
+      const row = Math.floor(i / 4);
+      const x = col * 180 + 30;
+      const y = row * 45 + 130;
+      return `<g transform="translate(${x}, ${y})">
+        <text class="char" x="0" y="20">${item.char}</text>
+        <text class="code" x="40" y="20">${item.code}</text>
+      </g>`;
+    }).join('\n');
+
+    const numbersItems = NUMBERS.map((item, i) => {
+      const col = i % 2;
+      const row = Math.floor(i / 2);
+      const x = col * 360 + 30;
+      const y = row * 45 + 460;
+      return `<g transform="translate(${x}, ${y})">
+        <text class="char" x="0" y="20">${item.char}</text>
+        <text class="code" x="40" y="20">${item.code}</text>
+      </g>`;
+    }).join('\n');
+
+    const svgContent = `<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 650" width="100%" height="100%">
+  <style>
+    .bg { fill: #0f1115; }
+    .card { fill: #1a1d23; stroke: #374151; stroke-width: 1; rx: 12px; }
+    .title { fill: #ffffff; font-family: sans-serif; font-size: 28px; font-weight: bold; }
+    .subtitle { fill: #9ca3af; font-family: monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
+    .heading { fill: #fbbf24; font-family: sans-serif; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+    .char { fill: #ffffff; font-family: sans-serif; font-size: 20px; font-weight: bold; }
+    .code { fill: #fbbf24; font-family: monospace; font-size: 20px; font-weight: bold; letter-spacing: 2px; }
+    .footer { fill: #4b5563; font-family: sans-serif; font-size: 11px; }
+  </style>
+  <rect class="bg" width="800" height="650" />
+  
+  <rect class="card" x="20" y="20" width="760" height="80" />
+  <text class="title" x="40" y="65">INTERNATIONAL MORSE CODE</text>
+  <text class="subtitle" x="400" y="62">Official Quick Reference Chart</text>
+  
+  <rect class="card" x="20" y="115" width="760" height="310" />
+  <text class="heading" x="35" y="145">Letters (A - Z)</text>
+  ${alphabetItems}
+
+  <rect class="card" x="20" y="440" width="760" height="150" />
+  <text class="heading" x="35" y="470">Numbers (0 - 9)</text>
+  ${numbersItems}
+
+  <text class="footer" x="25" y="620">Generated by Morse Code Translator | Scalable Vector Quick Reference Cheat Sheet.</text>
+</svg>`;
+
+    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'morse-code-cheat-sheet.svg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const getPhonetic = (code: string) => {
     return code.split('').map(s => s === '.' ? 'dit' : 'dah').join('-');
@@ -43,16 +163,18 @@ export default function Alphabet() {
 
   return (
     <div className="space-y-12">
+      <SEOHead lang={urlLang} pageType="alphabet" />
+
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest">
-        <Link to="/" className="hover:text-amber-400 transition-colors">Home</Link>
+      <nav className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest print:hidden">
+        <Link to={`/?lang=${urlLang}`} className="hover:text-amber-400 transition-colors">{textDict.home}</Link>
         <ChevronRight className="w-3 h-3" />
         <span className="text-amber-400">Morse Code Alphabet</span>
       </nav>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <Link to="/" className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors">
+          <Link to={`/?lang=${urlLang}`} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors print:hidden">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
@@ -132,6 +254,7 @@ export default function Alphabet() {
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Letter</th>
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Morse Code</th>
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Phonetic</th>
+                    <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800 text-center">Audio</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -140,6 +263,15 @@ export default function Alphabet() {
                       <td className="p-4 text-xl font-bold text-white border-b border-gray-800/50">{item.char}</td>
                       <td className="p-4 font-mono text-amber-400 text-lg border-b border-gray-800/50">{item.code}</td>
                       <td className="p-4 text-sm text-gray-400 italic border-b border-gray-800/50">{getPhonetic(item.code)}</td>
+                      <td className="p-4 border-b border-gray-800/50 text-center">
+                        <button 
+                          onClick={() => playSignal(item.code)}
+                          className="p-2 hover:bg-gray-800 text-amber-400 hover:text-amber-300 rounded-lg transition-colors inline-flex"
+                          aria-label={`Play sound for letter ${item.char}`}
+                        >
+                          <Volume2 className="w-4 h-4" />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -160,6 +292,7 @@ export default function Alphabet() {
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Number</th>
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Morse Code</th>
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Phonetic</th>
+                    <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800 text-center">Audio</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -168,6 +301,15 @@ export default function Alphabet() {
                       <td className="p-4 text-xl font-bold text-white border-b border-gray-800/50">{item.char}</td>
                       <td className="p-4 font-mono text-amber-400 text-lg border-b border-gray-800/50">{item.code}</td>
                       <td className="p-4 text-sm text-gray-400 italic border-b border-gray-800/50">{getPhonetic(item.code)}</td>
+                      <td className="p-4 border-b border-gray-800/50 text-center">
+                        <button 
+                          onClick={() => playSignal(item.code)}
+                          className="p-2 hover:bg-gray-800 text-amber-400 hover:text-amber-300 rounded-lg transition-colors inline-flex"
+                          aria-label={`Play sound for number ${item.char}`}
+                        >
+                          <Volume2 className="w-4 h-4" />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -188,6 +330,7 @@ export default function Alphabet() {
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Symbol</th>
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Morse Code</th>
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Phonetic</th>
+                    <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800 text-center">Audio</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -196,6 +339,15 @@ export default function Alphabet() {
                       <td className="p-4 text-xl font-bold text-white border-b border-gray-800/50">{item.char}</td>
                       <td className="p-4 font-mono text-amber-400 text-lg border-b border-gray-800/50">{item.code}</td>
                       <td className="p-4 text-sm text-gray-400 italic border-b border-gray-800/50">{getPhonetic(item.code)}</td>
+                      <td className="p-4 border-b border-gray-800/50 text-center">
+                        <button 
+                          onClick={() => playSignal(item.code)}
+                          className="p-2 hover:bg-gray-800 text-amber-400 hover:text-amber-300 rounded-lg transition-colors inline-flex"
+                          aria-label={`Play sound for punctuation ${item.char}`}
+                        >
+                          <Volume2 className="w-4 h-4" />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -211,7 +363,7 @@ export default function Alphabet() {
             </div>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-400 leading-relaxed">
-                The Morse code alphabet was developed in the 1830s and 1840s by Samuel Morse and Alfred Vail. It was originally designed for the electric telegraph, which used electrical pulses to transmit messages over long distances. Over time, the code was refined and standardized, leading to the International Morse Code we use today. This standard is essential for phrases like <Link to="/words/73" className="text-amber-400 hover:underline">73</Link> (Best Regards) and <Link to="/words/88" className="text-amber-400 hover:underline">88</Link> (Love and Kisses).
+                The Morse code alphabet was developed in the 1830s and 1840s by Samuel Morse and Alfred Vail. It was originally designed for the electric telegraph, which used electrical pulses to transmit messages over long distances. Over time, the code was refined and standardized, leading to the International Morse Code we use today. This standard is essential for phrases like <Link to={`/words/73?lang=${urlLang}`} className="text-amber-400 hover:underline">73</Link> (Best Regards) and <Link to={`/words/88?lang=${urlLang}`} className="text-amber-400 hover:underline">88</Link> (Love and Kisses).
               </p>
             </div>
           </article>
@@ -293,7 +445,7 @@ export default function Alphabet() {
               {MORSE_WORDS.slice(0, 6).map((word) => (
                 <Link 
                   key={word.slug} 
-                  to={`/words/${word.slug}`}
+                  to={`/words/${word.slug}?lang=${urlLang}`}
                   className="bg-[#1a1d23] border border-gray-800 p-6 rounded-2xl hover:border-amber-400/50 transition-all text-center group"
                 >
                   <span className="block font-bold text-white group-hover:text-amber-400 transition-colors text-lg mb-1">{word.word}</span>
@@ -306,6 +458,33 @@ export default function Alphabet() {
 
         {/* Sidebar */}
         <aside className="space-y-8">
+          {/* Printable Chart Download Card - High Value SEO Anchor */}
+          <div className="bg-gradient-to-br from-amber-400/10 to-transparent border border-amber-400/20 rounded-3xl p-8 space-y-6">
+            <div className="w-12 h-12 bg-amber-400/10 rounded-xl flex items-center justify-center text-amber-400">
+              <Download className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-xl font-display font-bold text-white leading-snug">Printable Cheat Sheet</h3>
+              <p className="text-gray-400 text-xs mt-2 leading-relaxed">
+                Download our high-fidelity, scalable vector (SVG) reference sheet of the International Morse Code standard. Perfect for study guides, desktop templates, and printouts.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={downloadCheatSheetSVG}
+                className="w-full py-3 bg-amber-400 hover:bg-amber-300 text-black font-bold rounded-xl text-center text-sm transition-colors flex items-center justify-center gap-2"
+              >
+                <Download className="w-4 h-4" /> Download SVG Chart
+              </button>
+              <button 
+                onClick={() => window.print()}
+                className="w-full py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-xl text-center text-sm border border-gray-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <Printer className="w-4 h-4" /> Print Cheat Sheet
+              </button>
+            </div>
+          </div>
+
           <div className="bg-[#1a1d23] border border-gray-800 rounded-3xl p-8 sticky top-24">
             <h3 className="text-xl font-display font-bold text-white mb-6">Learning Resources</h3>
             <div className="space-y-4">
@@ -330,7 +509,7 @@ export default function Alphabet() {
             </div>
             
             <div className="mt-8 pt-8 border-t border-gray-800">
-              <Link to="/" className="w-full py-3 bg-amber-400 text-black rounded-xl font-bold text-center block hover:bg-amber-300 transition-colors">
+              <Link to={`/?lang=${urlLang}`} className="w-full py-3 bg-amber-400 text-black rounded-xl font-bold text-center block hover:bg-amber-300 transition-colors">
                 Try the Translator
               </Link>
             </div>

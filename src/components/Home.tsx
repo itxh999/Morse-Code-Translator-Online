@@ -17,18 +17,26 @@ import {
 } from 'lucide-react';
 import { MORSE_WORDS } from '../constants/words';
 import Translator from './Translator';
+import SEOHead from './SEOHead';
+import { SupportedLanguage, TRANSLATIONS } from '../constants/translations';
 
 interface HomeProps {
+  lang?: SupportedLanguage;
   wpm: number;
   setWpm: (wpm: number) => void;
   frequency: number;
   setFrequency: (freq: number) => void;
 }
 
-export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps) {
+export default function Home({ lang = 'en', wpm, setWpm, frequency, setFrequency }: HomeProps) {
+  const textDict = TRANSLATIONS[lang] || TRANSLATIONS.en;
+
   return (
     <div className="space-y-12">
+      <SEOHead lang={lang} pageType="home" />
+
       <Translator 
+        lang={lang}
         wpm={wpm} 
         setWpm={setWpm} 
         frequency={frequency} 
@@ -38,24 +46,24 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       {/* Popular Words Section */}
       <section className="mt-20 space-y-8">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-display font-bold text-white">Popular Morse Code Phrases</h2>
+          <h2 className="text-2xl font-display font-bold text-white">{textDict.popularWordsTitle}</h2>
           <div className="h-px bg-gray-800 flex-grow mx-8 hidden md:block" />
-          <Link to="/alphabet" className="text-xs font-mono text-amber-400 hover:text-amber-300 uppercase tracking-widest flex items-center gap-2 transition-colors">
-            View Full Alphabet <ArrowRight className="w-3 h-3" />
+          <Link to={`/alphabet?lang=${lang}`} className="text-xs font-mono text-amber-400 hover:text-amber-300 uppercase tracking-widest flex items-center gap-2 transition-colors">
+            {textDict.viewFullAlphabet} <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {MORSE_WORDS.map((word) => (
             <Link 
               key={word.slug} 
-              to={`/words/${word.slug}`}
+              to={`/words/${word.slug}?lang=${lang}`}
               className="bg-[#1a1d23] border border-gray-800 p-6 rounded-2xl hover:border-amber-400/50 transition-all text-center group relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-full h-1 bg-amber-400/0 group-hover:bg-amber-400 transition-all" />
               <span className="block font-bold text-white group-hover:text-amber-400 transition-colors text-lg mb-1">{word.word}</span>
               <span className="block text-[10px] font-mono text-gray-400 tracking-widest">{word.morse}</span>
               <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-[10px] text-amber-400 font-bold uppercase">
-                Learn More <ArrowRight className="w-3 h-3" />
+                {textDict.learnMore} <ArrowRight className="w-3 h-3" />
               </div>
             </Link>
           ))}
@@ -66,7 +74,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       <section className="mt-20 space-y-8">
         <div className="flex items-center gap-3 text-amber-400">
           <Info className="w-6 h-6" />
-          <h2 className="text-3xl font-display font-bold text-white">What is a Morse Code Translator?</h2>
+          <h2 className="text-3xl font-display font-bold text-white">{textDict.whatIsTitle}</h2>
         </div>
         <div className="grid md:grid-cols-2 gap-12">
           <div className="prose prose-invert max-w-none">
@@ -85,7 +93,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       {/* Why Choose Our Tool */}
       <section className="mt-20 space-y-12">
         <div className="text-center space-y-4">
-          <h2 className="text-3xl font-display font-bold text-white">Why Use Our Morse Code Translator?</h2>
+          <h2 className="text-3xl font-display font-bold text-white">{textDict.whyChooseTitle}</h2>
           <p className="text-gray-400 max-w-3xl mx-auto">We've built the most reliable <strong>morse code translator</strong> on the web, focusing on precision, speed, and educational value.</p>
         </div>
         <div className="grid md:grid-cols-3 gap-8">
@@ -120,7 +128,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       {/* Use Cases Section */}
       <section className="mt-20 space-y-12">
         <div className="text-center space-y-4">
-          <h2 className="text-3xl font-display font-bold text-white">Popular Use Cases for a Morse Code Translator</h2>
+          <h2 className="text-3xl font-display font-bold text-white">{textDict.popularUseCases}</h2>
           <p className="text-gray-400 max-w-2xl mx-auto">From hobbyists to professionals, a <strong>morse code translator</strong> serves a wide variety of practical and creative purposes.</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -149,7 +157,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-400/10 rounded-full border border-amber-400/20 text-amber-400 text-xs font-mono uppercase tracking-widest">
               <Download className="w-3 h-3" /> Quick Access
             </div>
-            <h2 className="text-3xl font-display font-bold text-white">How to Install This Morse Code Translator</h2>
+            <h2 className="text-3xl font-display font-bold text-white">{textDict.howToInstall}</h2>
             <p className="text-gray-400">You can use our <strong>morse code translator</strong> as a standalone app on your mobile or desktop for faster access.</p>
             <div className="space-y-4">
               {[
@@ -189,7 +197,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       <section className="mt-20 space-y-12">
         <div className="flex items-center gap-3 text-amber-400">
           <PlayCircle className="w-6 h-6" />
-          <h2 className="text-3xl font-display font-bold text-white">How to Use the Morse Code Translator</h2>
+          <h2 className="text-3xl font-display font-bold text-white">{textDict.howToUseTitle}</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-8">
           <div className="bg-[#1a1d23] border border-gray-800 p-8 rounded-3xl space-y-4">
@@ -228,7 +236,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       <section className="mt-20 space-y-8">
         <div className="flex items-center gap-3 text-amber-400">
           <Info className="w-6 h-6" />
-          <h2 className="text-3xl font-display font-bold text-white">The Comprehensive History of Morse Code</h2>
+          <h2 className="text-3xl font-display font-bold text-white">{textDict.historyTitle}</h2>
         </div>
         <div className="grid md:grid-cols-2 gap-12">
           <div className="prose prose-invert max-w-none">
@@ -253,7 +261,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       {/* The Science of Morse Code Timing */}
       <section className="mt-20 space-y-12">
         <div className="text-center space-y-4">
-          <h2 className="text-3xl font-display font-bold text-white">The Science of Morse Code Timing & Standards</h2>
+          <h2 className="text-3xl font-display font-bold text-white">{textDict.scienceTitle}</h2>
           <p className="text-gray-400 max-w-3xl mx-auto">Understanding the mathematical precision behind a <strong>morse code translator</strong> is key to mastering the language.</p>
         </div>
         <div className="bg-[#1a1d23] border border-gray-800 rounded-3xl p-8 md:p-12 space-y-8">
@@ -291,7 +299,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       <section className="mt-20 space-y-8">
         <div className="flex items-center gap-3 text-amber-400">
           <Zap className="w-6 h-6" />
-          <h2 className="text-3xl font-display font-bold text-white">Tips & Best Practices</h2>
+          <h2 className="text-3xl font-display font-bold text-white">{textDict.tipsTitle}</h2>
         </div>
         <div className="grid md:grid-cols-2 gap-6">
           <div className="flex gap-4 p-6 bg-[#1a1d23] border border-gray-800 rounded-2xl">
@@ -318,7 +326,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       {/* Learning Methods Section */}
       <section className="mt-20 space-y-12">
         <div className="text-center space-y-4">
-          <h2 className="text-3xl font-display font-bold text-white">Advanced Morse Code Learning Methodologies</h2>
+          <h2 className="text-3xl font-display font-bold text-white">{textDict.methodologiesTitle}</h2>
           <p className="text-gray-400 max-w-3xl mx-auto">Don't just use a <strong>morse code translator</strong>—become the translator yourself using these proven techniques.</p>
         </div>
         <div className="grid md:grid-cols-2 gap-8">
@@ -356,7 +364,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       {/* Morse Code in Modern Technology */}
       <section className="mt-20 space-y-12">
         <div className="text-center space-y-4">
-          <h2 className="text-3xl font-display font-bold text-white">Morse Code in Modern Technology</h2>
+          <h2 className="text-3xl font-display font-bold text-white">{textDict.modernTechTitle}</h2>
           <p className="text-gray-400 max-w-3xl mx-auto">Despite the digital revolution, the <strong>morse code translator</strong> remains a vital tool in specialized fields.</p>
         </div>
         <div className="grid md:grid-cols-3 gap-8">
@@ -449,7 +457,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       <section className="mt-20 space-y-8">
         <div className="flex items-center gap-3 text-amber-400">
           <Zap className="w-6 h-6" />
-          <h2 className="text-3xl font-display font-bold text-white">How to Practice Morse Code at Home</h2>
+          <h2 className="text-3xl font-display font-bold text-white">{textDict.practiceTitle}</h2>
         </div>
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="prose prose-invert max-w-none">
@@ -485,7 +493,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
       <section className="mt-20 space-y-8">
         <div className="flex items-center gap-3 text-amber-400">
           <Globe className="w-6 h-6" />
-          <h2 className="text-3xl font-display font-bold text-white">Morse Code in Popular Culture</h2>
+          <h2 className="text-3xl font-display font-bold text-white">{textDict.popCultureTitle}</h2>
         </div>
         <div className="prose prose-invert max-w-none">
           <p className="text-gray-400 leading-relaxed text-lg">
@@ -499,7 +507,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
         </div>
       </section>
       <section className="mt-20 space-y-8">
-        <h2 className="text-3xl font-display font-bold text-white text-center">Pros & Cons of Using a Morse Code Translator Online</h2>
+        <h2 className="text-3xl font-display font-bold text-white text-center">{textDict.prosConsTitle}</h2>
         <div className="grid md:grid-cols-2 gap-8">
           <div className="bg-emerald-500/5 border border-emerald-500/20 p-8 rounded-3xl space-y-6">
             <h3 className="text-xl font-bold text-emerald-500 flex items-center gap-2">
@@ -544,7 +552,7 @@ export default function Home({ wpm, setWpm, frequency, setFrequency }: HomeProps
 
       {/* FAQ Section */}
       <section className="mt-20 bg-[#1a1d23] border border-gray-800 rounded-3xl p-8 md:p-12">
-        <h2 className="text-3xl font-display font-bold text-white mb-12 text-center">Morse Code Translator FAQ: Everything You Need to Know</h2>
+        <h2 className="text-3xl font-display font-bold text-white mb-12 text-center">{textDict.faqTitle}</h2>
         <div className="grid md:grid-cols-2 gap-8">
           {[
             { 

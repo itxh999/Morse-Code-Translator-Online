@@ -17,8 +17,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { textToMorse, morseToText } from '../services/morseUtils';
 import { useMorseAudio } from '../hooks/useMorseAudio';
 import ImageGenerator from './ImageGenerator';
+import { SupportedLanguage, TRANSLATIONS } from '../constants/translations';
 
 interface TranslatorProps {
+  lang?: SupportedLanguage;
   initialText?: string;
   initialMorse?: string;
   wpm: number;
@@ -27,7 +29,7 @@ interface TranslatorProps {
   setFrequency: (freq: number) => void;
 }
 
-export default function Translator({ initialText = '', initialMorse = '', wpm, setWpm, frequency, setFrequency }: TranslatorProps) {
+export default function Translator({ lang = 'en', initialText = '', initialMorse = '', wpm, setWpm, frequency, setFrequency }: TranslatorProps) {
   const [text, setText] = useState(initialText);
   const [morse, setMorse] = useState(initialMorse || textToMorse(initialText));
   const [isFlashing, setIsFlashing] = useState(false);
@@ -43,6 +45,8 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
   const progressIntervalRef = useRef<any>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const outputRef = useRef<HTMLDivElement>(null);
+
+  const textDict = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   useEffect(() => {
     if (initialText) {
@@ -277,13 +281,13 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
                   onClick={() => setActiveTab('text-to-morse')}
                   className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'text-to-morse' ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
                 >
-                  English to Morse Code
+                  {textDict.engToMorse}
                 </button>
                 <button 
                   onClick={() => setActiveTab('morse-to-text')}
                   className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'morse-to-text' ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
                 >
-                  Morse Code to English
+                  {textDict.morseToEng}
                 </button>
               </div>
             </div>
@@ -292,8 +296,8 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
               <button 
                 onClick={clearAll} 
                 className="p-3 text-gray-500 hover:text-red-400 transition-colors" 
-                title="Clear All"
-                aria-label="Clear all input and output"
+                title={textDict.clearAll}
+                aria-label={textDict.clearAll}
               >
                 <Trash2 className="w-5 h-5" />
               </button>
@@ -302,7 +306,7 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
 
           <div className="relative group">
             <label htmlFor="morse-input" className="sr-only">
-              {activeTab === 'text-to-morse' ? 'English text to translate' : 'Morse code to translate'}
+              {activeTab === 'text-to-morse' ? 'text to translate' : 'Morse code to translate'}
             </label>
             <textarea
               id="morse-input"
@@ -310,7 +314,7 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
               value={activeTab === 'text-to-morse' ? text : morse}
               onChange={activeTab === 'text-to-morse' ? handleTextChange : handleMorseChange}
               onFocus={() => setIsTelegraphFocused(false)}
-              placeholder={activeTab === 'text-to-morse' ? "English to morse code translator..." : "Translate morse code to english..."}
+              placeholder={activeTab === 'text-to-morse' ? textDict.placeholderText : textDict.placeholderMorse}
               className="w-full h-72 bg-[#1a1d23] border border-gray-800 rounded-2xl p-6 font-mono text-lg focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all resize-none placeholder:text-gray-600 overflow-y-auto shadow-inner"
             />
             <div className="absolute bottom-4 right-4 flex gap-2">
@@ -328,7 +332,7 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
         {/* Output Section */}
         <section className="space-y-4">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-mono uppercase tracking-widest text-gray-400">Translation Output</h2>
+            <h2 className="text-sm font-mono uppercase tracking-widest text-gray-400">{textDict.translationOutput}</h2>
           </div>
 
           <div className="relative group">
@@ -348,10 +352,10 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
                       </span>
                     ))
                   ) : (
-                    <span className="text-gray-500">Translate morse code results...</span>
+                    <span className="text-gray-500">{textDict.placeholderOutput}</span>
                   )
                 ) : (
-                  text || <span className="text-gray-500">Morse code translater results...</span>
+                  text || <span className="text-gray-500">{textDict.placeholderOutput}</span>
                 )}
                 {/* Blinking Cursor */}
                 <motion.span
@@ -377,18 +381,18 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
             <button 
               onClick={() => setIsImageModalOpen(true)}
               className="flex-1 flex items-center justify-center gap-2 px-3 sm:px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-xl text-xs sm:text-sm font-medium transition-colors text-gray-300 border border-gray-700/50 whitespace-nowrap"
-              aria-label="Generate Morse Image"
+              aria-label={textDict.generateImageBtn}
             >
               <ImageIcon className="w-4 h-4 shrink-0" />
-              <span>Generate Image</span>
+              <span>{textDict.generateImageBtn}</span>
             </button>
             <button 
               onClick={handlePlay}
               className={`flex-[1.5] flex items-center justify-center gap-2 px-3 sm:px-5 py-3 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${isPlaying ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-amber-400 text-black hover:bg-amber-300'}`}
-              aria-label={isPlaying ? 'Stop Audio' : 'Play Morse Code Audio'}
+              aria-label={isPlaying ? textDict.stopAudioButton : textDict.audioButton}
             >
               {isPlaying ? <Square className="w-4 h-4 fill-current shrink-0" /> : <Play className="w-4 h-4 fill-current shrink-0" />}
-              <span>{isPlaying ? 'Stop Audio' : 'Morse Code Audio'}</span>
+              <span>{isPlaying ? textDict.stopAudioButton : textDict.audioButton}</span>
             </button>
           </div>
         </section>
@@ -405,20 +409,20 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
             <div className="flex items-center gap-2">
               <div className={`w-1.5 h-1.5 rounded-full ${isTelegraphFocused ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-gray-700'}`} />
               <span className={`text-[9px] font-bold uppercase tracking-widest ${isTelegraphFocused ? 'text-emerald-500' : 'text-gray-600'}`}>
-                {isTelegraphFocused ? 'Telegraph Active' : 'Station Standby'}
+                {isTelegraphFocused ? textDict.stationActive : textDict.stationStandby}
               </span>
             </div>
             {isTelegraphFocused && <div className="h-3 w-[1px] bg-gray-800" />}
-            {isTelegraphFocused && <span className="text-[9px] text-gray-500 font-mono italic animate-pulse">[Spacebar to Transmit]</span>}
+            {isTelegraphFocused && <span className="text-[9px] text-gray-500 font-mono italic animate-pulse">{textDict.spacebarToTransmit}</span>}
           </div>
 
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
           
           <div className="text-center space-y-2 relative z-10">
             <h3 className="text-sm font-mono uppercase tracking-widest text-gray-500 flex items-center justify-center gap-2">
-              <Radio className="w-4 h-4" /> Telegraph Station
+              <Radio className="w-4 h-4" /> {textDict.telegraphStation}
             </h3>
-            <p className="text-xs text-gray-600 italic">"The world at your fingertips"</p>
+            <p className="text-xs text-gray-600 italic">{textDict.telegraphSubtitle}</p>
           </div>
           
           <div className="relative flex flex-col items-center">
@@ -483,16 +487,16 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
           <div className="w-full max-w-xs space-y-3 relative z-10 mt-16">
             <div className="flex justify-between items-end">
               <div className="space-y-1">
-                <span className="text-[10px] uppercase tracking-[0.2em] text-gray-600 block">Signal Status</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-gray-600 block">{textDict.signalStatus}</span>
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full transition-all duration-75 ${isKeyDown ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,1)]' : 'bg-stone-800'}`} />
                   <span className={`text-[10px] font-mono ${isKeyDown ? 'text-amber-400' : 'text-gray-600'}`}>
-                    {isKeyDown ? 'TRANSMITTING' : 'IDLE'}
+                    {isKeyDown ? textDict.transmitting : textDict.idle}
                   </span>
                 </div>
               </div>
               <span className="text-[10px] font-mono text-gray-500">
-                {silenceProgress < 44 ? 'WAITING...' : silenceProgress < 100 ? 'CHAR BREAK' : 'WORD BREAK'}
+                {silenceProgress < 44 ? textDict.waiting : silenceProgress < 100 ? textDict.charBreak : textDict.wordBreak}
               </span>
             </div>
             <div className="h-1 bg-stone-900 rounded-full overflow-hidden border border-white/5 relative">
@@ -504,13 +508,13 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
 
         <div className="bg-[#1a1d23] border border-gray-800 rounded-2xl p-8 space-y-6">
           <h3 className="text-sm font-mono uppercase tracking-widest text-gray-400 flex items-center gap-2">
-            <Settings className="w-4 h-4" /> Signal Settings
+            <Settings className="w-4 h-4" /> {textDict.signalSettings}
           </h3>
           
           <div className="space-y-4">
             <div className="space-y-2">
               <div className="flex justify-between">
-                <label htmlFor="speed-range" className="text-xs text-gray-400">Speed (WPM)</label>
+                <label htmlFor="speed-range" className="text-xs text-gray-400">{textDict.speed}</label>
                 <span className="text-xs font-mono text-amber-400">{wpm}</span>
               </div>
               <input 
@@ -523,7 +527,7 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <label htmlFor="freq-range" className="text-xs text-gray-400">Frequency (Hz)</label>
+                <label htmlFor="freq-range" className="text-xs text-gray-400">{textDict.frequency}</label>
                 <span className="text-xs font-mono text-amber-400">{frequency}</span>
               </div>
               <input 
@@ -537,7 +541,7 @@ export default function Translator({ initialText = '', initialMorse = '', wpm, s
 
           <div className="pt-4 border-t border-gray-800 flex flex-col gap-2">
             <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition-colors text-gray-300">
-              <Download className="w-4 h-4" /> Export as Audio
+              <Download className="w-4 h-4" /> {textDict.exportAudio}
             </button>
           </div>
         </div>

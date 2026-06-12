@@ -1,10 +1,13 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { MORSE_WORDS } from '../constants/words';
 import Translator from './Translator';
+import SEOHead from './SEOHead';
+import { SupportedLanguage, TRANSLATIONS } from '../constants/translations';
 import { ArrowLeft, BookOpen, History, Info, PenTool, Volume2, HelpCircle, ChevronRight, Table, Zap } from 'lucide-react';
 
 interface WordDetailProps {
+  lang?: SupportedLanguage;
   wpm: number;
   setWpm: (wpm: number) => void;
   frequency: number;
@@ -21,22 +24,66 @@ const MORSE_MAP: Record<string, string> = {
   '9': '----.', '0': '-----', ' ': '/'
 };
 
-export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: WordDetailProps) {
+export default function WordDetail({ lang = 'en', wpm, setWpm, frequency, setFrequency }: WordDetailProps) {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const urlLang = (searchParams.get('lang') as SupportedLanguage) || lang;
+  const textDict = TRANSLATIONS[urlLang] || TRANSLATIONS.en;
+
   const wordData = MORSE_WORDS.find(w => w.slug === slug);
 
   if (!wordData) {
     return (
       <div className="text-center py-20">
         <h2 className="text-2xl font-bold mb-4">Word not found</h2>
-        <Link to="/" className="text-amber-400 hover:underline flex items-center justify-center gap-2">
+        <Link to={`/?lang=${urlLang}`} className="text-amber-400 hover:underline flex items-center justify-center gap-2">
           <ArrowLeft className="w-4 h-4" /> Back to Home
         </Link>
       </div>
     );
   }
 
-  // Helper to generate "How to say" text
+  const playSignal = (code: string) => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(frequency, audioCtx.currentTime); 
+      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+      
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      osc.start();
+      
+      let time = audioCtx.currentTime + 0.02;
+      const dotDuration = 0.07;
+      
+      code.split('').forEach((symbol) => {
+        if (symbol === '.') {
+          gainNode.gain.setValueAtTime(0, time);
+          gainNode.gain.linearRampToValueAtTime(0.8, time + 0.005);
+          time += dotDuration;
+          gainNode.gain.setValueAtTime(0.8, time);
+          gainNode.gain.linearRampToValueAtTime(0, time + 0.005);
+          time += dotDuration;
+        } else if (symbol === '-') {
+          gainNode.gain.setValueAtTime(0, time);
+          gainNode.gain.linearRampToValueAtTime(0.8, time + 0.005);
+          time += dotDuration * 3;
+          gainNode.gain.setValueAtTime(0.8, time);
+          gainNode.gain.linearRampToValueAtTime(0, time + 0.005);
+          time += dotDuration;
+        }
+      });
+      
+      osc.stop(time + 0.05);
+    } catch (err) {
+      console.error("Audio playback error", err);
+    }
+  };
+
   const getHowToSay = (morse: string) => {
     return morse.split(' ').map(char => {
       if (char === '/') return '(space)';
@@ -48,22 +95,15 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
     }).filter(Boolean).join(' ');
   };
 
-  React.useEffect(() => {
-    if (wordData) {
-      document.title = `${wordData.word} in Morse Code - Morse Translator`;
-    }
-    return () => {
-      document.title = 'Morse Code Translator - English to Morse Code Online';
-    };
-  }, [wordData]);
-
   const wordChars = wordData.word.toUpperCase().split('');
 
   return (
     <div className="space-y-12">
+      <SEOHead lang={urlLang} pageType="detail" wordData={wordData} />
+
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest">
-        <Link to="/" className="hover:text-amber-400 transition-colors">Home</Link>
+        <Link to={`/?lang=${urlLang}`} className="hover:text-amber-400 transition-colors">{textDict.home}</Link>
         <ChevronRight className="w-3 h-3" />
         <span className="text-gray-400">Words</span>
         <ChevronRight className="w-3 h-3" />
@@ -72,7 +112,7 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <Link to="/" className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors">
+          <Link to={`/?lang=${urlLang}`} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
@@ -95,6 +135,7 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
       <section className="space-y-6">
         <div className="bg-[#1a1d23] border border-gray-800 rounded-3xl p-1 overflow-hidden">
           <Translator 
+            lang={urlLang}
             initialText={wordData.word} 
             wpm={wpm} 
             setWpm={setWpm} 
@@ -137,9 +178,9 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
                   <span className="text-xs font-mono text-gray-500 block mb-1">Total Units</span>
                   <span className="text-xl font-bold text-white">
                     {wordData.morse.split('').reduce((acc, char) => {
-                      if (char === '.') return acc + 2; // 1 for dot, 1 for gap
-                      if (char === '-') return acc + 4; // 3 for dash, 1 for gap
-                      if (char === ' ') return acc + 2; // 3 total for letter gap (already added 1)
+                      if (char === '.') return acc + 2; 
+                      if (char === '-') return acc + 4; 
+                      if (char === ' ') return acc + 2; 
                       return acc;
                     }, 0)} Units
                   </span>
@@ -175,6 +216,7 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Character</th>
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Morse Code</th>
                     <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800">Phonetic</th>
+                    <th className="p-4 text-xs font-mono uppercase tracking-widest text-gray-400 border-b border-gray-800 text-center">Audio</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -183,6 +225,17 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
                       <td className="p-4 text-xl font-bold text-white border-b border-gray-800/50">{char}</td>
                       <td className="p-4 font-mono text-amber-400 text-lg border-b border-gray-800/50">{MORSE_MAP[char] || ''}</td>
                       <td className="p-4 text-sm text-gray-400 italic border-b border-gray-800/50">{char === ' ' ? '(Space)' : getHowToSay(MORSE_MAP[char] || '')}</td>
+                      <td className="p-4 border-b border-gray-800/50 text-center">
+                        {MORSE_MAP[char] && MORSE_MAP[char] !== '/' && (
+                          <button 
+                            onClick={() => playSignal(MORSE_MAP[char])}
+                            className="p-2 hover:bg-gray-800 text-amber-400 hover:text-amber-300 rounded-lg transition-colors inline-flex"
+                            aria-label={`Play sound for character ${char}`}
+                          >
+                            <Volume2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -276,12 +329,12 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
         {/* Sidebar */}
         <aside className="space-y-8">
           <div className="bg-[#1a1d23] border border-gray-800 rounded-3xl p-8 sticky top-24">
-            <h3 className="text-xl font-display font-bold text-white mb-6">Popular Morse Words</h3>
+            <h3 className="text-xl font-display font-bold text-white mb-6 animate-pulse">Popular Morse Words</h3>
             <div className="space-y-4">
               {MORSE_WORDS.filter(w => w.slug !== slug).map(word => (
                 <Link 
                   key={word.slug} 
-                  to={`/words/${word.slug}`}
+                  to={`/words/${word.slug}?lang=${urlLang}`}
                   className="flex items-center justify-between p-4 bg-gray-900/50 border border-gray-800 rounded-xl hover:border-amber-400/50 transition-all group"
                 >
                   <div>
@@ -295,7 +348,7 @@ export default function WordDetail({ wpm, setWpm, frequency, setFrequency }: Wor
             
             <div className="mt-8 pt-8 border-t border-gray-800">
               <h4 className="text-sm font-bold text-white mb-4">Need a custom translation?</h4>
-              <Link to="/" className="w-full py-3 bg-amber-400 text-black rounded-xl font-bold text-center block hover:bg-amber-300 transition-colors">
+              <Link to={`/?lang=${urlLang}`} className="w-full py-3 bg-amber-400 text-black rounded-xl font-bold text-center block hover:bg-amber-300 transition-colors">
                 Back to Main Translator
               </Link>
             </div>

@@ -81,6 +81,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     letters: 'Letters',
     numbers: 'Numbers',
     punctuation: 'Punctuation',
+    backToTop: 'Back to Top',
 
     // Main UI
     engToMorse: 'English to Morse Code',
@@ -143,6 +144,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     letters: 'Letras',
     numbers: 'Números',
     punctuation: 'Puntuación',
+    backToTop: 'Volver arriba',
 
     // Main UI
     engToMorse: 'Texto a Código Morse',
@@ -205,6 +207,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     letters: 'Letras',
     numbers: 'Números',
     punctuation: 'Pontuação',
+    backToTop: 'Voltar ao topo',
 
     // Main UI
     engToMorse: 'Texto para Código Morse',
@@ -267,6 +270,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     letters: 'Lettres',
     numbers: 'Chiffres',
     punctuation: 'Ponctuation',
+    backToTop: 'Retour en haut',
 
     // Main UI
     engToMorse: 'Texte en Code Morse',
@@ -329,6 +333,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     letters: 'Harfler',
     numbers: 'Sayılar',
     punctuation: 'Noktalama',
+    backToTop: 'Yukarı Git',
 
     // Main UI
     engToMorse: 'Metni Mors Koduna Çevir',
@@ -391,6 +396,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     letters: 'Buchstaben',
     numbers: 'Zahlen',
     punctuation: 'Satzzeichen',
+    backToTop: 'Nach oben',
 
     // Main UI
     engToMorse: 'Text in Morsecode',

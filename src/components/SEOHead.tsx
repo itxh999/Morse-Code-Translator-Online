@@ -108,7 +108,7 @@ export default function SEOHead({ lang, pageType, wordData }: SEOHeadProps) {
     metaKeywords.setAttribute('content', keywords);
 
     // 5. Update Canonical link
-    const currentUrl = `https://morse-code-translator.wwkejishe.top${location.pathname}${location.search}`;
+    const currentUrl = `https://morse-code-translator.wwkejishe.top${location.pathname}`;
     let canonicalLink = document.querySelector('link[rel="canonical"]');
     if (!canonicalLink) {
       canonicalLink = document.createElement('link');
@@ -117,7 +117,12 @@ export default function SEOHead({ lang, pageType, wordData }: SEOHeadProps) {
     }
     canonicalLink.setAttribute('href', currentUrl);
 
-    // 5b. Update hreflang alternate links for multilingual SEO crawling
+    // 5b. Update hreflang alternate links for multilingual SEO crawling using absolute paths
+    const pathParts = location.pathname.split('/');
+    const firstPart = pathParts[1];
+    const hasLangPrefix = LANGUAGES.some(l => l.code === firstPart && firstPart !== 'en');
+    const basePath = hasLangPrefix ? '/' + pathParts.slice(2).join('/') : location.pathname;
+
     LANGUAGES.forEach(l => {
       let hrTag = document.querySelector(`link[rel="alternate"][hreflang="${l.code}"]`);
       if (!hrTag) {
@@ -126,7 +131,13 @@ export default function SEOHead({ lang, pageType, wordData }: SEOHeadProps) {
         hrTag.setAttribute('hreflang', l.code);
         document.head.appendChild(hrTag);
       }
-      hrTag.setAttribute('href', `https://morse-code-translator.wwkejishe.top${location.pathname}?lang=${l.code}`);
+      
+      const targetPath = l.code === 'en' 
+        ? basePath 
+        : `/${l.code}${basePath === '/' ? '' : basePath}`;
+      const targetUrl = `https://morse-code-translator.wwkejishe.top${targetPath}`;
+      
+      hrTag.setAttribute('href', targetUrl);
     });
 
     // Add x-default hreflang pointing to english standard route
@@ -137,7 +148,7 @@ export default function SEOHead({ lang, pageType, wordData }: SEOHeadProps) {
       defaultHrTag.setAttribute('hreflang', 'x-default');
       document.head.appendChild(defaultHrTag);
     }
-    defaultHrTag.setAttribute('href', `https://morse-code-translator.wwkejishe.top${location.pathname}`);
+    defaultHrTag.setAttribute('href', `https://morse-code-translator.wwkejishe.top${basePath}`);
 
     // 6. Update OpenGraph Social Tags
     const updateOGTag = (property: string, content: string, attributeType: 'property' | 'name' = 'property') => {

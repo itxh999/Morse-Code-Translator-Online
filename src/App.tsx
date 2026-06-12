@@ -14,11 +14,12 @@ function AppContent() {
   return (
     <Layout lang={lang} changeLanguage={changeLanguage}>
       <Routes>
+        {/* English (Default) Routes */}
         <Route 
           path="/" 
           element={
             <Home 
-              lang={lang}
+              lang="en"
               wpm={wpm} 
               setWpm={setWpm} 
               frequency={frequency} 
@@ -26,12 +27,12 @@ function AppContent() {
             />
           } 
         />
-        <Route path="/alphabet" element={<Alphabet lang={lang} />} />
+        <Route path="/alphabet" element={<Alphabet lang="en" />} />
         <Route 
           path="/words/:slug" 
           element={
             <WordDetail 
-              lang={lang}
+              lang="en"
               wpm={wpm} 
               setWpm={setWpm} 
               frequency={frequency} 
@@ -39,6 +40,37 @@ function AppContent() {
             />
           } 
         />
+
+        {/* Localized routes per supported language prefix */}
+        {['es', 'pt', 'fr', 'tr', 'de'].map((l) => (
+          <React.Fragment key={l}>
+            <Route 
+              path={`/${l}`} 
+              element={
+                <Home 
+                  lang={l as any}
+                  wpm={wpm} 
+                  setWpm={setWpm} 
+                  frequency={frequency} 
+                  setFrequency={setFrequency} 
+                />
+              } 
+            />
+            <Route path={`/${l}/alphabet`} element={<Alphabet lang={l as any} />} />
+            <Route 
+              path={`/${l}/words/:slug`} 
+              element={
+                <WordDetail 
+                  lang={l as any}
+                  wpm={wpm} 
+                  setWpm={setWpm} 
+                  frequency={frequency} 
+                  setFrequency={setFrequency} 
+                />
+              } 
+            />
+          </React.Fragment>
+        ))}
       </Routes>
     </Layout>
   );
@@ -53,3 +85,4 @@ function App() {
 }
 
 export default App;
+

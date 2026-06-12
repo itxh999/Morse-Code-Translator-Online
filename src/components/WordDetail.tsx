@@ -1,10 +1,11 @@
 import React from 'react';
-import { useParams, Link, useSearchParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { MORSE_WORDS } from '../constants/words';
 import Translator from './Translator';
 import SEOHead from './SEOHead';
 import { SupportedLanguage, TRANSLATIONS } from '../constants/translations';
 import { ArrowLeft, BookOpen, History, Info, PenTool, Volume2, HelpCircle, ChevronRight, Table, Zap } from 'lucide-react';
+import { getLocalizedPath } from '../utils/path';
 
 interface WordDetailProps {
   lang?: SupportedLanguage;
@@ -26,8 +27,7 @@ const MORSE_MAP: Record<string, string> = {
 
 export default function WordDetail({ lang = 'en', wpm, setWpm, frequency, setFrequency }: WordDetailProps) {
   const { slug } = useParams<{ slug: string }>();
-  const [searchParams] = useSearchParams();
-  const urlLang = (searchParams.get('lang') as SupportedLanguage) || lang;
+  const urlLang = lang;
   const textDict = TRANSLATIONS[urlLang] || TRANSLATIONS.en;
 
   const wordData = MORSE_WORDS.find(w => w.slug === slug);
@@ -36,7 +36,7 @@ export default function WordDetail({ lang = 'en', wpm, setWpm, frequency, setFre
     return (
       <div className="text-center py-20">
         <h2 className="text-2xl font-bold mb-4">Word not found</h2>
-        <Link to={`/?lang=${urlLang}`} className="text-amber-400 hover:underline flex items-center justify-center gap-2">
+        <Link to={getLocalizedPath('/', urlLang)} className="text-amber-400 hover:underline flex items-center justify-center gap-2">
           <ArrowLeft className="w-4 h-4" /> Back to Home
         </Link>
       </div>
@@ -102,8 +102,8 @@ export default function WordDetail({ lang = 'en', wpm, setWpm, frequency, setFre
       <SEOHead lang={urlLang} pageType="detail" wordData={wordData} />
 
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest">
-        <Link to={`/?lang=${urlLang}`} className="hover:text-amber-400 transition-colors">{textDict.home}</Link>
+      <nav className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest font-sans">
+        <Link to={getLocalizedPath('/', urlLang)} className="hover:text-amber-400 transition-colors">{textDict.home}</Link>
         <ChevronRight className="w-3 h-3" />
         <span className="text-gray-400">Words</span>
         <ChevronRight className="w-3 h-3" />
@@ -112,7 +112,7 @@ export default function WordDetail({ lang = 'en', wpm, setWpm, frequency, setFre
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <Link to={`/?lang=${urlLang}`} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors">
+          <Link to={getLocalizedPath('/', urlLang)} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
@@ -334,7 +334,7 @@ export default function WordDetail({ lang = 'en', wpm, setWpm, frequency, setFre
               {MORSE_WORDS.filter(w => w.slug !== slug).map(word => (
                 <Link 
                   key={word.slug} 
-                  to={`/words/${word.slug}?lang=${urlLang}`}
+                  to={getLocalizedPath(`/words/${word.slug}`, urlLang)}
                   className="flex items-center justify-between p-4 bg-gray-900/50 border border-gray-800 rounded-xl hover:border-amber-400/50 transition-all group"
                 >
                   <div>
@@ -348,7 +348,7 @@ export default function WordDetail({ lang = 'en', wpm, setWpm, frequency, setFre
             
             <div className="mt-8 pt-8 border-t border-gray-800">
               <h4 className="text-sm font-bold text-white mb-4">Need a custom translation?</h4>
-              <Link to={`/?lang=${urlLang}`} className="w-full py-3 bg-amber-400 text-black rounded-xl font-bold text-center block hover:bg-amber-300 transition-colors">
+              <Link to={getLocalizedPath('/', urlLang)} className="w-full py-3 bg-amber-400 text-black rounded-xl font-bold text-center block hover:bg-amber-300 transition-colors">
                 Back to Main Translator
               </Link>
             </div>

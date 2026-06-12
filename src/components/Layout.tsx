@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Radio, Settings, Info, X, Globe, ChevronDown } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { SupportedLanguage, LANGUAGES, TRANSLATIONS } from '../constants/translations';
+import { getLocalizedPath } from '../utils/path';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -36,6 +37,7 @@ export default function Layout({ children, lang, changeLanguage }: LayoutProps) 
   const [showInfo, setShowInfo] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   
   const textDict = TRANSLATIONS[lang] || TRANSLATIONS.en;
   const currentLangConfig = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
@@ -58,7 +60,7 @@ export default function Layout({ children, lang, changeLanguage }: LayoutProps) 
       {/* Header */}
       <header className="border-b border-gray-800 bg-[#15181e]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to={`/?lang=${lang}`} className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+          <Link to={getLocalizedPath('/', lang)} className="flex items-center gap-3 hover:opacity-90 transition-opacity">
             <div className="w-10 h-10 bg-amber-400 rounded-lg flex items-center justify-center shadow-lg shadow-amber-400/20">
               <Radio className="text-black w-6 h-6" />
             </div>
@@ -99,28 +101,36 @@ export default function Layout({ children, lang, changeLanguage }: LayoutProps) 
                       <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest pl-2">Select Language</span>
                     </div>
                     <div className="p-1.5 space-y-0.5">
-                      {LANGUAGES.map((item) => (
-                        <a
-                          key={item.code}
-                          href={`?lang=${item.code}`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            changeLanguage(item.code);
-                            setShowLangMenu(false);
-                          }}
-                          className={`flex items-center justify-between w-full px-3 py-2 text-xs font-mono rounded-lg transition-colors ${
-                            lang === item.code 
-                              ? 'bg-amber-400/10 text-white font-bold' 
-                              : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                          }`}
-                        >
-                          <span className="flex items-center gap-2">
-                            <span>{item.flag}</span>
-                            <span>{item.localName}</span>
-                          </span>
-                          <span className="text-[9px] text-gray-600 uppercase">{item.code}</span>
-                        </a>
-                      ))}
+                      {LANGUAGES.map((item) => {
+                        const pathParts = location.pathname.split('/');
+                        const currentLangPrefix = pathParts[1];
+                        const hasLangPrefix = LANGUAGES.some(l => l.code === currentLangPrefix && currentLangPrefix !== 'en');
+                        const basePath = hasLangPrefix ? '/' + pathParts.slice(2).join('/') : location.pathname;
+                        const localizedTargetHref = getLocalizedPath(basePath, item.code);
+
+                        return (
+                          <a
+                            key={item.code}
+                            href={localizedTargetHref}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              changeLanguage(item.code);
+                              setShowLangMenu(false);
+                            }}
+                            className={`flex items-center justify-between w-full px-3 py-2 text-xs font-mono rounded-lg transition-colors ${
+                              lang === item.code 
+                                ? 'bg-amber-400/10 text-white font-bold' 
+                                : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                            }`}
+                          >
+                            <span className="flex items-center gap-2">
+                              <span>{item.flag}</span>
+                              <span>{item.localName}</span>
+                            </span>
+                            <span className="text-[9px] text-gray-600 uppercase">{item.code}</span>
+                          </a>
+                        );
+                      })}
                     </div>
                   </motion.div>
                 )}
@@ -215,7 +225,7 @@ export default function Layout({ children, lang, changeLanguage }: LayoutProps) 
             © 2026 {textDict.logoTitle}. All Rights Reserved.
           </p>
           <div className="flex gap-6">
-            <Link to={`/?lang=${lang}`} className="text-gray-400 hover:text-amber-400 text-xs transition-colors">
+            <Link to={getLocalizedPath('/', lang)} className="text-gray-400 hover:text-amber-400 text-xs transition-colors">
               {textDict.home}
             </Link>
             <a href="#" className="text-gray-400 hover:text-amber-400 text-xs transition-colors">{textDict.privacy}</a>

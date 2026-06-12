@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Table, 
@@ -17,6 +17,7 @@ import {
 import { MORSE_WORDS } from '../constants/words';
 import SEOHead from './SEOHead';
 import { SupportedLanguage, TRANSLATIONS } from '../constants/translations';
+import { getLocalizedPath } from '../utils/path';
 
 interface AlphabetProps {
   lang?: SupportedLanguage;
@@ -49,8 +50,7 @@ const PUNCTUATION = [
 ];
 
 export default function Alphabet({ lang = 'en' }: AlphabetProps) {
-  const [searchParams] = useSearchParams();
-  const urlLang = (searchParams.get('lang') as SupportedLanguage) || lang;
+  const urlLang = lang;
   const textDict = TRANSLATIONS[urlLang] || TRANSLATIONS.en;
 
   const playSignal = (code: string) => {
@@ -167,14 +167,14 @@ export default function Alphabet({ lang = 'en' }: AlphabetProps) {
 
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 text-xs font-mono text-gray-400 uppercase tracking-widest print:hidden">
-        <Link to={`/?lang=${urlLang}`} className="hover:text-amber-400 transition-colors">{textDict.home}</Link>
+        <Link to={getLocalizedPath('/', urlLang)} className="hover:text-amber-400 transition-colors">{textDict.home}</Link>
         <ChevronRight className="w-3 h-3" />
         <span className="text-amber-400">Morse Code Alphabet</span>
       </nav>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <Link to={`/?lang=${urlLang}`} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors print:hidden">
+          <Link to={getLocalizedPath('/', urlLang)} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors print:hidden">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
@@ -363,7 +363,7 @@ export default function Alphabet({ lang = 'en' }: AlphabetProps) {
             </div>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-400 leading-relaxed">
-                The Morse code alphabet was developed in the 1830s and 1840s by Samuel Morse and Alfred Vail. It was originally designed for the electric telegraph, which used electrical pulses to transmit messages over long distances. Over time, the code was refined and standardized, leading to the International Morse Code we use today. This standard is essential for phrases like <Link to={`/words/73?lang=${urlLang}`} className="text-amber-400 hover:underline">73</Link> (Best Regards) and <Link to={`/words/88?lang=${urlLang}`} className="text-amber-400 hover:underline">88</Link> (Love and Kisses).
+                The Morse code alphabet was developed in the 1830s and 1840s by Samuel Morse and Alfred Vail. It was originally designed for the electric telegraph, which used electrical pulses to transmit messages over long distances. Over time, the code was refined and standardized, leading to the International Morse Code we use today. This standard is essential for phrases like <Link to={getLocalizedPath('/words/73', urlLang)} className="text-amber-400 hover:underline">73</Link> (Best Regards) and <Link to={getLocalizedPath('/words/88', urlLang)} className="text-amber-400 hover:underline">88</Link> (Love and Kisses).
               </p>
             </div>
           </article>
@@ -445,7 +445,7 @@ export default function Alphabet({ lang = 'en' }: AlphabetProps) {
               {MORSE_WORDS.slice(0, 6).map((word) => (
                 <Link 
                   key={word.slug} 
-                  to={`/words/${word.slug}?lang=${urlLang}`}
+                  to={getLocalizedPath(`/words/${word.slug}`, urlLang)}
                   className="bg-[#1a1d23] border border-gray-800 p-6 rounded-2xl hover:border-amber-400/50 transition-all text-center group"
                 >
                   <span className="block font-bold text-white group-hover:text-amber-400 transition-colors text-lg mb-1">{word.word}</span>
@@ -509,7 +509,7 @@ export default function Alphabet({ lang = 'en' }: AlphabetProps) {
             </div>
             
             <div className="mt-8 pt-8 border-t border-gray-800">
-              <Link to={`/?lang=${urlLang}`} className="w-full py-3 bg-amber-400 text-black rounded-xl font-bold text-center block hover:bg-amber-300 transition-colors">
+              <Link to={getLocalizedPath('/', urlLang)} className="w-full py-3 bg-amber-400 text-black rounded-xl font-bold text-center block hover:bg-amber-300 transition-colors">
                 Try the Translator
               </Link>
             </div>

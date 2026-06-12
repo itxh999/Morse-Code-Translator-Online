@@ -19,6 +19,7 @@ import { MORSE_WORDS } from '../constants/words';
 import Translator from './Translator';
 import SEOHead from './SEOHead';
 import { SupportedLanguage, TRANSLATIONS } from '../constants/translations';
+import { getLocalizedPath } from '../utils/path';
 
 interface HomeProps {
   lang?: SupportedLanguage;
@@ -48,7 +49,7 @@ export default function Home({ lang = 'en', wpm, setWpm, frequency, setFrequency
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-display font-bold text-white">{textDict.popularWordsTitle}</h2>
           <div className="h-px bg-gray-800 flex-grow mx-8 hidden md:block" />
-          <Link to={`/alphabet?lang=${lang}`} className="text-xs font-mono text-amber-400 hover:text-amber-300 uppercase tracking-widest flex items-center gap-2 transition-colors">
+          <Link to={getLocalizedPath('/alphabet', lang)} className="text-xs font-mono text-amber-400 hover:text-amber-300 uppercase tracking-widest flex items-center gap-2 transition-colors">
             {textDict.viewFullAlphabet} <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
@@ -56,7 +57,7 @@ export default function Home({ lang = 'en', wpm, setWpm, frequency, setFrequency
           {MORSE_WORDS.map((word) => (
             <Link 
               key={word.slug} 
-              to={`/words/${word.slug}?lang=${lang}`}
+              to={getLocalizedPath(`/words/${word.slug}`, lang)}
               className="bg-[#1a1d23] border border-gray-800 p-6 rounded-2xl hover:border-amber-400/50 transition-all text-center group relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-full h-1 bg-amber-400/0 group-hover:bg-amber-400 transition-all" />

@@ -1,43 +1,49 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { SupportedLanguage, LANGUAGES } from '../constants/translations';
+import { getLocalizedPath } from '../utils/path';
 
 export function useLanguage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [lang, setLang] = useState<SupportedLanguage>('en');
 
   useEffect(() => {
-    // 1. Check URL query string first (best for search crawlers)
-    const urlLang = searchParams.get('lang') as SupportedLanguage | null;
-    if (urlLang && LANGUAGES.some(l => l.code === urlLang)) {
-      setLang(urlLang);
-      localStorage.setItem('preferred_lang', urlLang);
-      return;
-    }
+    // Detect language from path prefix (e.g. /es/alphabet -> 'es')
+    const pathParts = location.pathname.split('/');
+    const firstPart = pathParts[1] as SupportedLanguage;
 
-    // 2. Check LocalStorage
-    const storedLang = localStorage.getItem('preferred_lang') as SupportedLanguage | null;
-    if (storedLang && LANGUAGES.some(l => l.code === storedLang)) {
-      setLang(storedLang);
-      // Update URL to match preference so crawlers or direct links get synced
-      setSearchParams({ lang: storedLang }, { replace: true });
-      return;
-    }
-
-    // 3. Fallback to navigator language
-    const navLang = navigator.language.split('-')[0] as SupportedLanguage;
-    if (LANGUAGES.some(l => l.code === navLang)) {
-      setLang(navLang);
-      setSearchParams({ lang: navLang }, { replace: true });
+    if (LANGUAGES.some(l => l.code === firstPart && firstPart !== 'en')) {
+      setLang(firstPart);
+      localStorage.setItem('preferred_lang', firstPart);
     } else {
       setLang('en');
     }
-  }, [searchParams, setSearchParams]);
+  }, [location.pathname]);
 
   const changeLanguage = (newLang: SupportedLanguage) => {
+    const pathParts = location.pathname.split('/');
+    const currentLangPrefix = pathParts[1];
+    const hasLangPrefix = LANGUAGES.some(l => l.code === currentLangPrefix && currentLangPrefix !== 'en');
+
+    // Get the base path without any existing language prefix
+    let basePath = '';
+    if (hasLangPrefix) {
+      basePath = '/' + pathParts.slice(2).join('/');
+    } else {
+      basePath = location.pathname;
+    }
+
+    // Generate the new path using our localized path utility
+    const newPath = getLocalizedPath(basePath, newLang);
+
+    // Keep search query and hash if present
+    const search = location.search;
+    const hash = location.hash;
+
     setLang(newLang);
     localStorage.setItem('preferred_lang', newLang);
-    setSearchParams({ lang: newLang });
+    navigate(`${newPath}${search}${hash}`);
   };
 
   return {
@@ -45,3 +51,4 @@ export function useLanguage() {
     changeLanguage
   };
 }
+

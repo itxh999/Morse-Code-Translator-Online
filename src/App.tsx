@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Home from './components/Home';
 import WordDetail from './components/WordDetail';
 import Alphabet from './components/Alphabet';
+import ScrollToTop from './components/ScrollToTop';
 import { useLanguage } from './hooks/useLanguage';
 
 function AppContent() {
@@ -13,6 +14,7 @@ function AppContent() {
 
   return (
     <Layout lang={lang} changeLanguage={changeLanguage}>
+      <ScrollToTop />
       <Routes>
         {/* English (Default) Routes */}
         <Route 

@@ -113,12 +113,12 @@ export default function Home({ lang = 'en', wpm, setWpm, frequency, setFrequency
         <div className="grid md:grid-cols-2 gap-12">
           <div className="prose prose-invert max-w-none">
             <p className="text-gray-400 leading-relaxed text-lg">
-              A <strong>Morse Code Translator</strong> is an essential digital tool for anyone looking to convert text into the rhythmic language of dots and dashes. Our professional-grade <strong>morse code translator</strong> bridges the gap between 19th-century telegraphy and modern digital communication. Whether you're looking to send an SOS signal or simply curious about how "Hello" looks in code, this <strong>morse code translator</strong> provides instantaneous, accurate results for both encoding and decoding tasks.
+              A <strong>Morse Code Translator</strong> converts plain text into dots and dashes, and can also decode Morse code back into readable English. Use it to check an SOS signal, translate a short message, or see how words like "Hello" are written in International Morse Code.
             </p>
           </div>
           <div className="prose prose-invert max-w-none">
             <p className="text-gray-400 leading-relaxed text-lg">
-              Our platform is more than just a basic <strong>morse code translator online</strong>; it's a comprehensive learning environment. By integrating high-fidelity audio synthesis and synchronized visual indicators, this <strong>morse code translator</strong> helps users master the timing and rhythm required for professional operation. Built strictly on the International Telecommunication Union (ITU) standards, our <strong>morse code translator</strong> ensures your messages are technically correct and globally recognized.
+              The tool combines instant conversion with audio playback and synchronized visual cues, so beginners can learn the rhythm instead of only reading symbols. It follows International Telecommunication Union (ITU) timing rules, making the output useful for study, quick reference, and radio practice.
             </p>
           </div>
         </div>
@@ -128,23 +128,23 @@ export default function Home({ lang = 'en', wpm, setWpm, frequency, setFrequency
       <section className="mt-20 space-y-12">
         <div className="text-center space-y-4">
           <h2 className="text-3xl font-display font-bold text-white">{textDict.whyChooseTitle}</h2>
-          <p className="text-gray-400 max-w-3xl mx-auto">We've built the most reliable <strong>morse code translator</strong> on the web, focusing on precision, speed, and educational value.</p>
+          <p className="text-gray-400 max-w-3xl mx-auto">This Morse code translator focuses on accurate conversion, clear audio playback, and beginner-friendly practice without adding unnecessary steps.</p>
         </div>
         <div className="grid md:grid-cols-3 gap-8">
           {[
             { 
               title: "ITU Standard Accuracy", 
-              desc: "Every translation performed by our <strong>morse code translator</strong> follows the strict ITU guidelines for timing and character representation.",
+              desc: "Every text-to-Morse and Morse-to-English result follows ITU character patterns and standard timing relationships.",
               icon: <ShieldCheck className="w-6 h-6" />
             },
             { 
               title: "Real-Time Audio & Visuals", 
-              desc: "Hear the 'dits' and 'dahs' as you type. Our <strong>morse code translator</strong> provides multi-sensory feedback for better learning.",
+              desc: "Hear the 'dits' and 'dahs' as you type, then use the visual timing cues to connect each symbol with its sound.",
               icon: <PlayCircle className="w-6 h-6" />
             },
             { 
               title: "Offline PWA Support", 
-              desc: "Install this <strong>morse code translator</strong> on your device and use it even without an active internet connection.",
+              desc: "Install the web app on your device for faster access when you want to translate, listen, or practice.",
               icon: <Download className="w-6 h-6" />
             }
           ].map((feature, i) => (
@@ -163,7 +163,7 @@ export default function Home({ lang = 'en', wpm, setWpm, frequency, setFrequency
       <section className="mt-20 space-y-12">
         <div className="text-center space-y-4">
           <h2 className="text-3xl font-display font-bold text-white">{textDict.popularUseCases}</h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">From hobbyists to professionals, a <strong>morse code translator</strong> serves a wide variety of practical and creative purposes.</p>
+          <p className="text-gray-400 max-w-2xl mx-auto">From hobbyists to professionals, Morse code tools support practical communication, training, and creative decoding tasks.</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {[
@@ -192,12 +192,12 @@ export default function Home({ lang = 'en', wpm, setWpm, frequency, setFrequency
               <Download className="w-3 h-3" /> Quick Access
             </div>
             <h2 className="text-3xl font-display font-bold text-white">{textDict.howToInstall}</h2>
-            <p className="text-gray-400">You can use our <strong>morse code translator</strong> as a standalone app on your mobile or desktop for faster access.</p>
+            <p className="text-gray-400">You can use this Morse code translator as a standalone app on mobile or desktop for faster access.</p>
             <div className="space-y-4">
               {[
-                "Open this <strong>morse code translator</strong> in your browser.",
+                "Open the Morse code converter in your browser.",
                 "Click the 'Add to Home Screen' or 'Install' prompt.",
-                "The <strong>morse code translator</strong> will appear in your app list.",
+                "The app will appear in your device's app list.",
                 "Launch it anytime to translate text to morse code instantly."
               ].map((step, i) => (
                 <div key={i} className="flex items-start gap-4">
@@ -240,7 +240,7 @@ export default function Home({ lang = 'en', wpm, setWpm, frequency, setFrequency
             <code className="block text-sm text-amber-400 font-mono bg-black/30 p-4 rounded-lg break-all">
               https://morse-code-translator.wwkejishe.top/
             </code>
-            <p className="text-[10px] text-gray-500 italic">Bookmark our <strong>morse code translator</strong> for quick access during your practice sessions.</p>
+            <p className="text-[10px] text-gray-500 italic">Bookmark this tool for quick access during practice sessions.</p>
           </div>
         </div>
       </section>
@@ -254,15 +254,15 @@ export default function Home({ lang = 'en', wpm, setWpm, frequency, setFrequency
         <div className="grid md:grid-cols-3 gap-8">
           <div className="bg-[#1a1d23] border border-gray-800 p-8 rounded-3xl space-y-4">
             <h3 className="text-xl font-bold text-white">1. English to Morse</h3>
-            <p className="text-sm text-gray-400 leading-relaxed">Simply type your English text into the input field. Our <strong>morse code translator</strong> will convert it into dots and dashes in real-time as you type.</p>
+            <p className="text-sm text-gray-400 leading-relaxed">Type English text into the input field and the converter will turn it into dots and dashes in real time.</p>
           </div>
           <div className="bg-[#1a1d23] border border-gray-800 p-8 rounded-3xl space-y-4">
             <h3 className="text-xl font-bold text-white">2. Morse to English</h3>
-            <p className="text-sm text-gray-400 leading-relaxed">Switch the mode and enter Morse code signals. The <strong>morse code translator</strong> will decode them into readable English text instantly.</p>
+            <p className="text-sm text-gray-400 leading-relaxed">Switch the mode and enter Morse code signals to decode them into readable English text instantly.</p>
           </div>
           <div className="bg-[#1a1d23] border border-gray-800 p-8 rounded-3xl space-y-4">
             <h3 className="text-xl font-bold text-white">3. Audio Practice</h3>
-            <p className="text-sm text-gray-400 leading-relaxed">Use the 'Play' button on our <strong>morse code translator</strong> to hear the rhythm. Adjust the WPM to match your current skill level.</p>
+            <p className="text-sm text-gray-400 leading-relaxed">Use the 'Play' button to hear the rhythm, then adjust WPM and frequency to match your current skill level.</p>
           </div>
         </div>
         

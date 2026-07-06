@@ -126,9 +126,6 @@ export default function WordDetail({ lang = 'en', wpm, setWpm, frequency, setFre
           <span className="px-3 py-1 bg-gray-800 rounded-full text-[10px] font-mono text-gray-400 uppercase tracking-widest border border-gray-700">
             Popular Phrase
           </span>
-          <span className="px-3 py-1 bg-amber-400/10 rounded-full text-[10px] font-mono text-amber-400 uppercase tracking-widest border border-amber-400/20">
-            SEO Optimized
-          </span>
         </div>
       </div>
 

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Zap,
@@ -31,6 +32,38 @@ interface HomeProps {
 
 export default function Home({ lang = 'en', wpm, setWpm, frequency, setFrequency }: HomeProps) {
   const textDict = TRANSLATIONS[lang] || TRANSLATIONS.en;
+  const [urlCopyFeedback, setUrlCopyFeedback] = useState<'idle' | 'success' | 'error'>('idle');
+  const urlCopyTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (urlCopyTimeoutRef.current) {
+        window.clearTimeout(urlCopyTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const showUrlCopyFeedback = (status: 'success' | 'error') => {
+    if (urlCopyTimeoutRef.current) {
+      window.clearTimeout(urlCopyTimeoutRef.current);
+    }
+
+    setUrlCopyFeedback(status);
+    urlCopyTimeoutRef.current = window.setTimeout(() => {
+      setUrlCopyFeedback('idle');
+      urlCopyTimeoutRef.current = null;
+    }, 2000);
+  };
+
+  const copyHomeUrl = async () => {
+    try {
+      await navigator.clipboard.writeText('https://morse-code-translator.wwkejishe.top/');
+      showUrlCopyFeedback('success');
+    } catch (err) {
+      console.error('Copy failed', err);
+      showUrlCopyFeedback('error');
+    }
+  };
 
   return (
     <div className="space-y-12">
@@ -178,12 +211,30 @@ export default function Home({ lang = 'en', wpm, setWpm, frequency, setFrequency
             <div className="flex items-center justify-between border-b border-gray-800 pb-4">
               <span className="text-xs font-mono text-gray-500 uppercase">Direct Access URL</span>
               <button 
-                onClick={() => {
-                  navigator.clipboard.writeText('https://morse-code-translator.wwkejishe.top/');
-                }}
-                className="text-[10px] font-mono text-amber-400 hover:underline active:opacity-50 transition-opacity"
+                onClick={copyHomeUrl}
+                className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-mono uppercase tracking-widest transition-all active:opacity-60 ${
+                  urlCopyFeedback === 'success'
+                    ? 'bg-emerald-400/10 text-emerald-300'
+                    : urlCopyFeedback === 'error'
+                      ? 'bg-red-400/10 text-red-300'
+                      : 'text-amber-400 hover:bg-amber-400/10'
+                }`}
+                aria-live="polite"
+                aria-label={
+                  urlCopyFeedback === 'success'
+                    ? 'Copied URL'
+                    : urlCopyFeedback === 'error'
+                      ? 'Copy URL failed'
+                      : 'Copy URL'
+                }
               >
-                Copy URL
+                {urlCopyFeedback === 'success' && <CheckCircle2 className="w-3 h-3" />}
+                {urlCopyFeedback === 'error' && <XCircle className="w-3 h-3" />}
+                {urlCopyFeedback === 'success'
+                  ? 'Copied'
+                  : urlCopyFeedback === 'error'
+                    ? 'Copy failed'
+                    : 'Copy URL'}
               </button>
             </div>
             <code className="block text-sm text-amber-400 font-mono bg-black/30 p-4 rounded-lg break-all">

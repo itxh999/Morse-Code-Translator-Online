@@ -6,6 +6,8 @@ import {
   Square, 
   Download, 
   Copy, 
+  CheckCircle2,
+  XCircle,
   Trash2, 
   Settings, 
   Zap,
@@ -38,11 +40,17 @@ export default function Translator({ lang = 'en', initialText = '', initialMorse
   const [silenceProgress, setSilenceProgress] = useState(0); // 0 to 100
   const [isTelegraphFocused, setIsTelegraphFocused] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState<{
+    target: 'input' | 'output' | null;
+    status: 'success' | 'empty' | 'error' | null;
+    message: string;
+  }>({ target: null, status: null, message: '' });
   
   const { playMorse, stopAudio, isPlaying, currentIndex } = useMorseAudio();
   const silenceTimeoutRef = useRef<any>(null);
   const wordSilenceTimeoutRef = useRef<any>(null);
   const progressIntervalRef = useRef<any>(null);
+  const copyFeedbackTimeoutRef = useRef<number | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const outputRef = useRef<HTMLDivElement>(null);
 
@@ -82,8 +90,98 @@ export default function Translator({ lang = 'en', initialText = '', initialMorse
     setText(morseToText(sanitized));
   };
 
-  const copyToClipboard = (content: string) => {
-    navigator.clipboard.writeText(content);
+  useEffect(() => {
+    return () => {
+      if (copyFeedbackTimeoutRef.current) {
+        window.clearTimeout(copyFeedbackTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const showCopyFeedback = (
+    target: 'input' | 'output',
+    status: 'success' | 'empty' | 'error',
+    message: string
+  ) => {
+    if (copyFeedbackTimeoutRef.current) {
+      window.clearTimeout(copyFeedbackTimeoutRef.current);
+    }
+
+    setCopyFeedback({ target, status, message });
+    copyFeedbackTimeoutRef.current = window.setTimeout(() => {
+      setCopyFeedback({ target: null, status: null, message: '' });
+      copyFeedbackTimeoutRef.current = null;
+    }, 2000);
+  };
+
+  const copyToClipboard = async (content: string, target: 'input' | 'output') => {
+    if (!content.trim()) {
+      showCopyFeedback(target, 'empty', 'Nothing to copy');
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(content);
+      showCopyFeedback(target, 'success', 'Copied');
+    } catch (err) {
+      console.error('Copy failed', err);
+      showCopyFeedback(target, 'error', 'Copy failed');
+    }
+  };
+
+  const getCopyButtonClasses = (target: 'input' | 'output') => {
+    if (copyFeedback.target !== target) {
+      return 'text-gray-400 hover:text-white border-gray-700/50';
+    }
+
+    if (copyFeedback.status === 'success') {
+      return 'text-emerald-300 border-emerald-400/40 shadow-[0_0_20px_rgba(52,211,153,0.12)]';
+    }
+
+    if (copyFeedback.status === 'error') {
+      return 'text-red-300 border-red-400/40 shadow-[0_0_20px_rgba(248,113,113,0.12)]';
+    }
+
+    return 'text-amber-300 border-amber-400/40 shadow-[0_0_20px_rgba(251,191,36,0.12)]';
+  };
+
+  const renderCopyIcon = (target: 'input' | 'output') => {
+    if (copyFeedback.target === target && copyFeedback.status === 'success') {
+      return <CheckCircle2 className="w-5 h-5" />;
+    }
+
+    if (copyFeedback.target === target && copyFeedback.status === 'error') {
+      return <XCircle className="w-5 h-5" />;
+    }
+
+    return <Copy className="w-5 h-5" />;
+  };
+
+  const renderCopyFeedback = (target: 'input' | 'output') => {
+    if (copyFeedback.target !== target || !copyFeedback.message) {
+      return null;
+    }
+
+    const toneClass =
+      copyFeedback.status === 'success'
+        ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200'
+        : copyFeedback.status === 'error'
+          ? 'border-red-400/30 bg-red-400/10 text-red-200'
+          : 'border-amber-400/30 bg-amber-400/10 text-amber-200';
+
+    return (
+      <motion.span
+        initial={{ opacity: 0, y: 4, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 4, scale: 0.96 }}
+        transition={{ duration: 0.14 }}
+        className={`absolute bottom-16 right-0 whitespace-nowrap rounded-lg border px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest shadow-xl backdrop-blur ${toneClass}`}
+        role="status"
+        aria-live="polite"
+      >
+        {copyFeedback.message}
+      </motion.span>
+    );
   };
 
   const clearAll = () => {
@@ -318,12 +416,16 @@ export default function Translator({ lang = 'en', initialText = '', initialMorse
               className="w-full h-72 bg-[#1a1d23] border border-gray-800 rounded-2xl p-6 font-mono text-lg focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all resize-none placeholder:text-gray-600 overflow-y-auto shadow-inner"
             />
             <div className="absolute bottom-4 right-4 flex gap-2">
+              <AnimatePresence>
+                {renderCopyFeedback('input')}
+              </AnimatePresence>
               <button 
-                onClick={() => copyToClipboard(activeTab === 'text-to-morse' ? text : morse)}
-                className="p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-all border border-gray-700/50"
-                aria-label="Copy input text"
+                onClick={() => copyToClipboard(activeTab === 'text-to-morse' ? text : morse, 'input')}
+                className={`p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg transition-all border ${getCopyButtonClasses('input')}`}
+                aria-label={copyFeedback.target === 'input' ? copyFeedback.message : 'Copy input text'}
+                aria-live="polite"
               >
-                <Copy className="w-5 h-5" />
+                {renderCopyIcon('input')}
               </button>
             </div>
           </div>
@@ -366,12 +468,16 @@ export default function Translator({ lang = 'en', initialText = '', initialMorse
               </div>
             </div>
             <div className="absolute bottom-4 right-4 flex gap-2 z-20">
+              <AnimatePresence>
+                {renderCopyFeedback('output')}
+              </AnimatePresence>
               <button 
-                onClick={() => copyToClipboard(activeTab === 'text-to-morse' ? morse : text)}
-                className="p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-all border border-gray-700/50"
-                aria-label="Copy translation output"
+                onClick={() => copyToClipboard(activeTab === 'text-to-morse' ? morse : text, 'output')}
+                className={`p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg transition-all border ${getCopyButtonClasses('output')}`}
+                aria-label={copyFeedback.target === 'output' ? copyFeedback.message : 'Copy translation output'}
+                aria-live="polite"
               >
-                <Copy className="w-5 h-5" />
+                {renderCopyIcon('output')}
               </button>
             </div>
           </div>
